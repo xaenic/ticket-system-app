@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketResponseController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,12 +43,34 @@ Route::prefix('departments')
 Route::prefix('users')
     ->group(function () {
 
-        Route::get('/', [UserController::class, 'index']);
+        Route::get('/', [UserController::class, 'userTickets']);
         Route::post('/', [UserController::class, 'store']);
 
         Route::delete('/{id}', [UserController::class, 'destroy'])->where('id', '[0-9]+');
         Route::put('/{id}', [UserController::class, 'update'])->where('id', '[0-9]+');
         Route::patch('/{id}', [UserController::class, 'assign'])->where('id', '[0-9]+');
+
+});
+
+Route::prefix('tickets')
+    ->group(function () {
+
+        Route::get('/', [TicketController::class, 'userTickets']);
+        Route::get('/all', [TicketController::class, 'index']);
+        Route::post('/', [TicketController::class, 'store']);
+
+        Route::delete('/{id}', [TicketController::class, 'destroy'])->where('id', '[0-9]+');
+        Route::put('/{id}', [TicketController::class, 'update'])->where('id', '[0-9]+');
+        Route::patch('/{id}', [TicketController::class, 'assign'])->where('id', '[0-9]+');
+
+
+        Route::prefix('responses')
+            ->group(function() {
+                Route::get('/{id}', [TicketResponseController::class, 'index']);
+                Route::post('/', [TicketResponseController::class, 'store']);
+                Route::delete('/{id}', [TicketResponseController::class, 'destroy'])->where('id', '[0-9]+');
+                Route::put('/{id}', [TicketResponseController::class, 'update'])->where('id', '[0-9]+');
+        });
 });
 Route::get('/test', function () {
     return response()->json(['message' => 'Admin access granted']);

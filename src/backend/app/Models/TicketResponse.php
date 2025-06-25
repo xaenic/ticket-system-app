@@ -10,7 +10,7 @@ class TicketResponse extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['ticket_id', 'user_id', 'message', 'created_at'];
+    protected $fillable = ['ticket_id', 'user_id', 'message'];
 
     public function user() {
         return $this->belongsTo(User::class);

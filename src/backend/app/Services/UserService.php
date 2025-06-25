@@ -16,16 +16,12 @@ class userService {
         $this->user = $user;
     }
 
-    public function getAllUsers() {
-        return $this->user->all();
-    }
-
-
+    
     public function createUser(array $data) {
         return $this->user->create($data);
     }
     
-    public function updateuser(int $id, array $data) {
+    public function updateUser(int $id, array $data) {
 
         $user = $this->user->find($id);
 
@@ -34,7 +30,7 @@ class userService {
         return $user->update($data);
     }
 
-    public function assigndepartment(int $id, int $departmentId) {
+    public function assignDepartment(int $id, int $departmentId) {
         $user = $this->user->find($id);
         $user->department_id = $departmentId;
         return $user->save();
@@ -44,6 +40,15 @@ class userService {
         return $this->user->find($id)->delete();
     }
     
+    public function getUserById(int $id) {
+        return $this->user->find($id);
+    }
+
+    public function getAllUsers() {
+        return $this->user->all();
+    }
+
+
 
     
 }

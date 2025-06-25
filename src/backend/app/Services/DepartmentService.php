@@ -33,6 +33,10 @@ class DepartmentService {
         return $this->department->find($id)->delete();
     }
     
+    public function getDepartmentById(int $id) {
+        return $this->department->find($id);
+    }
+    
     public function getAllDepartments() {
         return $this->department->all();
     }
