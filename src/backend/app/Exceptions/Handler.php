@@ -25,12 +25,20 @@ class Handler extends ExceptionHandler
      */
      public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (Throwable $e) {
+            if ($e instanceof ValidationException) {
+                    return response()->json([
+                        'code' => 422,
+                        'error' => 'Validation failed',
+                        'messages' => $e->errors(),
+                    ], 422);
+            }
+
         });
 
     }
 
+    
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return response()->json(['code' => 401, 'error' => 'Unauthenticated'], 401);

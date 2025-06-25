@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DepartmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,8 +25,21 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 
+// department routes
 
+Route::prefix('departments')
+    ->group(function () {
 
+        Route::get('/', [DepartmentController::class, 'index']);
+        Route::post('/', [DepartmentController::class, 'store']);
+
+        
+        Route::delete('/{id}', [DepartmentController::class, 'destroy'])
+            ->where('id', '[0-9]+');
+
+        Route::put('/{id}', [DepartmentController::class, 'update'])
+            ->where('id', '[0-9]+');
+    });
 
 Route::get('/test', function () {
     return response()->json(['message' => 'Admin access granted']);
