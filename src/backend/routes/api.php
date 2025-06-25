@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketResponseController;
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -49,6 +50,7 @@ Route::prefix('users')
         Route::patch('/{id}', [UserController::class, 'assign'])->where('id', '[0-9]+');
 
 });
+Route::get('/dashboard', [DashboardController::class, 'index']);
 
 Route::prefix('tickets')
     ->group(function () {

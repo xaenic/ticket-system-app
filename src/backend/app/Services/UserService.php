@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\User;
 
+use Spatie\Permission\Models\Role;
 
 class userService {
 
@@ -51,7 +52,8 @@ class userService {
         return $this->user->all();
     }
 
-
-
+    public function getUserCountsByRole(string $role) {
+        return $this->user->role($role)->count();
+    }
     
 }

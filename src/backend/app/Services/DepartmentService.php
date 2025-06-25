@@ -40,5 +40,9 @@ class DepartmentService {
     public function getAllDepartments() {
         return $this->department->all();
     }
+
+    public function getDepartmentCounts() {
+        return $this->department->count();
+    }
     
 }

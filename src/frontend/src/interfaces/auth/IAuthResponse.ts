@@ -1,6 +1,6 @@
-import { type User } from "../IUser";
+import { type IUser } from "../IUser";
 export interface IAuthResponse {
-  user: User | null;
+  user: IUser | null;
   message: string;
   token?: string
 }

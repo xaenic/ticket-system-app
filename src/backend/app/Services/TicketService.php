@@ -56,5 +56,21 @@ class TicketService {
         if($role === 'client') 
         return $this->ticket->where('client_id', $id)->get();
     }
+
+    public function getRecentTickets(int $limit = 5) {
+        return $this->ticket->orderBy('created_at', 'desc')->take($limit)->get();
+    }
+
+    public function getTicketCounts() {
+        return $this->ticket->count();
+    }
+
+    public function getTicketCountByStatus(string $status) {
+        return $this->ticket->where('status', $status)->count();
+    }
+
+    public function getTicketCountByPriority(string $priority) {
+        return $this->ticket->where('priority', $priority)->count();
+    }
     
 }
