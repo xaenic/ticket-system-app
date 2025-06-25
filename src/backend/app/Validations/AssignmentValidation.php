@@ -5,22 +5,22 @@ namespace App\Validations;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DepartmentValidation extends FormRequest
+class AssignmentDepartmentValidation extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
      */
+    
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:departments,name',
+            'department_id' => 'required|exists:departments,id',
         ];
     }
 
-    public function getName(): string
+    public function getDepartmentId(): int
     {
-        return $this->input('name');
+        return $this->input('department_id');
     }
+    
 }
-
-

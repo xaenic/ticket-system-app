@@ -26,6 +26,7 @@ Route::middleware(['auth:api', 'role:admin'])->get('/user', function (Request $r
 //auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/me', [AuthController::class, 'user']);
 
 Route::prefix('departments')
     ->group(function () {

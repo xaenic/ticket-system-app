@@ -44,6 +44,9 @@ class userService {
         return $this->user->find($id);
     }
 
+    public function getUserByEmail(string $email) {
+        return $this->user->where('email', $email)->first();
+    }
     public function getAllUsers() {
         return $this->user->all();
     }

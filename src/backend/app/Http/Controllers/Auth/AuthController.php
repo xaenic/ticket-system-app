@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+use App\Validations\UserValidation as UserRequest;
+use App\Validations\UserLoginValidation as LoginRequest;
+
+use App\Services\UserService;
 class AuthController extends Controller
 {
     /**
@@ -16,86 +20,71 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request)
+
+    protected $userService;
+
+    public function __construct(UserService $userService) {
+        $this->userService = $userService;
+        $this->middleware('auth:api',['except' => ['register', 'login']]);
+    }
+
+    public function register(UserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $data = $request->validated();
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
+        $user = $this->userService->createUser($data);
         $token = $user->createToken('Personal Access Token')->accessToken;
         
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => $user,
+            'user' => [
+                "name" => $user->name,
+                "email" => $user->email,
+                "role" => $user->roles->first()->name ?? null
+            ],
             'token' => $token
         ], 201);
     }
-
-    /**
-     * Login user and create token
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $data = $request->validated();
 
-        // Check email
-        $user = User::where('email', $request->email)->first();
+        $user = $this->userService->getUserByEmail($data['email']);
 
-        // Check password
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if(!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
-                'message' => 'The provided credentials are incorrect.'
+                'message' => 'The provided credentials are incorrect.',
             ], 401);
         }
-
+  
         $token = $user->createToken('Personal Access Token')->accessToken;
 
         return response()->json([
             'message' => 'User logged in successfully',
-            'user' => $user,
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->roles->first()->name ?? null
+            ],
             'token' => $token
         ]);
     }
 
-    /**
-     * Get the authenticated User
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function user(Request $request)
+    public function user()
     {
-        return response()->json($request->user());
+        $user = $this->userService->getUserById(auth()->id());
+
+        return response()->json([
+            'message' => 'User retrieved successfully',
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->roles->first()->name ?? null
+            ]
+        ]);
     }
 
-    /**
-     * Log the user out (Invalidate the token)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
