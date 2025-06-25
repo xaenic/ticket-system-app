@@ -30,7 +30,7 @@ class DepartmentService {
     }
 
     public function deleteDepartment(int $id) {
-        return $this->department->destroy($id);
+        return $this->department->find($id)->delete();
     }
     
     public function getAllDepartments() {

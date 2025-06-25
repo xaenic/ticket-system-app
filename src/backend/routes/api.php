@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,14 +34,20 @@ Route::prefix('departments')
         Route::get('/', [DepartmentController::class, 'index']);
         Route::post('/', [DepartmentController::class, 'store']);
 
-        
-        Route::delete('/{id}', [DepartmentController::class, 'destroy'])
-            ->where('id', '[0-9]+');
+        Route::delete('/{id}', [DepartmentController::class, 'destroy'])->where('id', '[0-9]+');
+        Route::put('/{id}', [DepartmentController::class, 'update'])->where('id', '[0-9]+');
+});
 
-        Route::put('/{id}', [DepartmentController::class, 'update'])
-            ->where('id', '[0-9]+');
-    });
+Route::prefix('users')
+    ->group(function () {
 
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+
+        Route::delete('/{id}', [UserController::class, 'destroy'])->where('id', '[0-9]+');
+        Route::put('/{id}', [UserController::class, 'update'])->where('id', '[0-9]+');
+        Route::patch('/{id}', [UserController::class, 'assign'])->where('id', '[0-9]+');
+});
 Route::get('/test', function () {
     return response()->json(['message' => 'Admin access granted']);
 });
