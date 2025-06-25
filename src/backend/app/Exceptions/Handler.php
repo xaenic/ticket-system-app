@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Exceptions;
-
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -21,10 +23,18 @@ class Handler extends ExceptionHandler
     /**
      * Register the exception handling callbacks for the application.
      */
-    public function register(): void
+     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             //
         });
+
     }
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return response()->json(['code' => 401, 'error' => 'Unauthenticated'], 401);
+    }
+
+
 }

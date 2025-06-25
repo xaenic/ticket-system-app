@@ -35,7 +35,7 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('Personal Access Token')->accessToken;
-
+        
         return response()->json([
             'message' => 'User registered successfully',
             'user' => $user,
