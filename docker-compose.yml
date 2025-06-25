@@ -1,0 +1,25 @@
+# version: '3.8'
+
+services:
+  mysql:
+    build: ./docker/mysql
+    container_name: pyreact_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: exam
+      MYSQL_USER: allan
+      MYSQL_PASSWORD: allan123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - pyreact-network
+
+networks:
+  pyreact-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
