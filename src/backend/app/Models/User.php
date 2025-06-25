@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-
+use App\Models\Department;
+use App\Models\Ticket;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'department_id',
     ];
 
     /**
@@ -43,4 +45,29 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    /**
+     * Relationships
+    
+     */
+
+
+    public function department() {
+
+        return $this->belongsTo(Department::class);
+    }
+
+    public function tickets() {
+
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function responses () {
+        return $this->hasMany(TicketResponse::class);
+    }
+
+    public function assignedTickets() {
+        return $this->hasMany(Ticket::class, 'assigned_user_id');
+    }
 }
