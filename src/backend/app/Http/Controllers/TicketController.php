@@ -21,7 +21,7 @@ class TicketController extends Controller
         $this->ticketService = $ticketService;
 
         $this->middleware(['auth:api']);
-        $this->middleware(['role:admin'], ['except' => ['assign']]);
+        $this->middleware(['role:admin'], ['except' => ['userTickets','assign','store']]);
     }
 
     public function index() {
@@ -33,9 +33,12 @@ class TicketController extends Controller
     public function store(TicketRequest $request) {
 
         $data = $request->validated();
-
+        $data['attachments'] = $request->file('attachments', []);
+        $data['uploaded_by'] = auth()->id();
+  
+        
         $results = $this->ticketService->createTicket($data);
-
+        
         return response()->json([
             'status' => 'success',
         ], 201);
@@ -93,15 +96,19 @@ class TicketController extends Controller
         ], 200);
     }
 
-    public function userTickets() {
+    public function userTickets(Request $request) {
 
         $id = auth()->id();
-        $role = auth()->user()->getRoleNames()->first();
-        $results = $this->ticketService->getAllTickets($role, $id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $results ?? [],
-        ], 200);
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $query = $request->query('query',"");
+        $status = $request->query('status',"");
+        $priority = $request->query('priority',"");
+
+        $role = auth()->user()->getRoleNames()->first();
+        $results = $this->ticketService->getAllTickets($role, $id, $page, $perPage, $query,$status,$priority);
+
+        return response()->json($results , 200);
     }
 }

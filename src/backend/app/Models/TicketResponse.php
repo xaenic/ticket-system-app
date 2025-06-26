@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Ticket;
+use App\Models\Attachment;
 class TicketResponse extends Model
 {
     use HasFactory;
@@ -18,5 +19,9 @@ class TicketResponse extends Model
     
     public function ticket() {
         return $this->belongsTo(Ticket::class);
+    }
+
+    public function attachments() {
+        return $this->hasMany(Attachment::class);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\TicketResponse;
+use App\Models\Attachment;
 class Ticket extends Model
 {
     use HasFactory;
@@ -29,5 +30,8 @@ class Ticket extends Model
 
     public function responses() {
         return $this->hasMany(TicketResponse::class);
+    }
+     public function attachments() {
+        return $this->hasMany(Attachment::class);
     }
 }

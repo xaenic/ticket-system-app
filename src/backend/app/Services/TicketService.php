@@ -20,7 +20,23 @@ class TicketService {
 
 
     public function createTicket(array $data) {
-        return $this->ticket->create($data);
+        $data['client_id'] = $data['uploaded_by'];
+        $ticket = $this->ticket->create($data);
+        if(isset($data['attachments'])) {
+           foreach ($data['attachments'] as $file) {
+                $path = $file->store('attachments', 'private');
+                $ticket->attachments()->create([
+                    'filename' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                    'extension' => $file->getClientOriginalExtension(),
+                    'uploaded_by' => $data['uploaded_by'],
+                   
+                ]);
+            }
+        }
+        return $ticket;
     }
     
     public function updateTicket(int $id, array $data) {
@@ -46,15 +62,21 @@ class TicketService {
         return $this->ticket->with('responses')->find($id);
     }
 
-    public function getAlltickets(string $role, int $id = null, int $page = 1, int $perpage = 10) {
-        if(!$id && $role === 'admin') {
-            return $this->ticket->paginate($perpage, ['*'], 'page', $page);
-        }
-        if($role === 'agent') {
-            return $this->ticket->where('agent_id', $id)->paginate($perpage, ['*'], 'page', $page);
-        }
-        if($role === 'client') 
-        return $this->ticket->where('client_id', $id)->paginate($perpage, ['*'], 'page', $page);
+    public function getAlltickets(string $role, int $id = null, int $page = 1, int $perpage = 10, string $query = '', string $status ='' , string $priority='') {
+
+        $ticketQuery = Ticket::query();
+
+        if($query)      $ticketQuery->where('assigned_user_id',$id)->where('title', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
+
+        if($status)     $ticketQuery->where('status', $status);
+        
+        if($priority)   $ticketQuery->where('priority', $priority);
+
+        if($role === 'agent') $ticketQuery->where('assigned_user_id',$id);
+        
+        if($role === 'client') $ticketQuery->where('client_id',$id);
+
+         return $ticketQuery->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getRecentTickets(int $limit = 5) {

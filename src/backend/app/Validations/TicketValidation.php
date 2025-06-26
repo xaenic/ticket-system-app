@@ -15,8 +15,11 @@ class TicketValidation extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'status' => ['required', 'in:pending,open,closed,duplicate'],
+            'status' => ['sometimes', 'in:pending,open,closed,duplicate'],
             'priority' => ['required', 'in:low,medium,high'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,docx,txt', 'max:10240'],
         ];
 
     }
@@ -47,5 +50,9 @@ class TicketValidation extends FormRequest
     public function getDepartmentId(): int
     {
         return $this->input('department_id');
+    }
+    public function getAttachments(): array
+    {
+        return $this->file('attachments', []); // returns array of UploadedFile
     }
 }
