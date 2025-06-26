@@ -12,3 +12,14 @@ export const AdminRoutes = [
         component: lazy(() => import('@/pages/admin/Department')),
     }
 ]
+
+export const ClientRoutes = [
+    {
+        path: "dashboard",
+        component: lazy(() => import('@/pages/client/Dashboard')),
+    },
+       {
+        path: "departments",
+        component: lazy(() => import('@/pages/client/Department')),
+    }
+]

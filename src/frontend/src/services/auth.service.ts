@@ -1,5 +1,6 @@
 import type { IAuthResponse } from "@/interfaces/auth/IAuthResponse";
 import api from "@/utils/api";
+import { AxiosError } from "axios";
 
 export const loginService = async (
   email: string,
@@ -12,8 +13,10 @@ export const loginService = async (
 
     return response.data;
   } catch (error) {
-    console.error("Login error:", error);
-    throw error;
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      throw new Error("Invalid credentials");
+    }
+    throw new Error("Something went wrong");
   }
 };
 

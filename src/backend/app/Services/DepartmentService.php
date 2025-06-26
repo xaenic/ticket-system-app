@@ -42,7 +42,7 @@ class DepartmentService {
         if($query) return $this->department->where('name', 'like', "%{$query}%")
                                     ->paginate($perpage, ['*'], 'page', $page);
         
-        return $this->department->paginate($perpage, ['*'], 'page', $page);
+        return $this->department->orderBy('created_at', 'desc')->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getDepartmentCounts() {

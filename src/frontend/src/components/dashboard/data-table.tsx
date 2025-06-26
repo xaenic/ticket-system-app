@@ -21,6 +21,7 @@ import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight, Loader2, PlusIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { RowsPerPage } from "./RowsPerPage";
+import { DialogTrigger } from "../ui/dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -37,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   onPageChange: (page: number) => void;
   onPerPageChange: (value: string) => void;
   onSearchChange: (value: string) => void;
+  onAddClick: () => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +56,7 @@ export function DataTable<TData, TValue>({
   onPageChange,
   onPerPageChange,
   onSearchChange,
+  onAddClick,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -80,10 +83,12 @@ export function DataTable<TData, TValue>({
           />
         </div>
         <div>
-          <Button size={"sm"} variant={"default"}>
-            <PlusIcon />
-            New {tableTitle}
-          </Button>
+          <DialogTrigger asChild>
+            <Button size={"sm"} onClick={onAddClick} variant={"default"}>
+              <PlusIcon />
+              New {tableTitle}
+            </Button>
+          </DialogTrigger>
         </div>
       </div>
       <Table>
@@ -111,15 +116,18 @@ export function DataTable<TData, TValue>({
         <TableBody className="relative">
           {isLoading ? (
             <>
-              <div className="absolute w-full h-full flex items-center justify-center">
-                <Loader2 className="mr-2 h-8 w-8 animate-spin text-slate-600" />
-              </div>
               {[...Array(3)].map((_, index) => (
                 <TableRow className="border-none" key={index}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center"
-                  ></TableCell>
+                    className="h-24 text-center relative"
+                  >
+                    {index === 1 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="mr-2 h-8 w-8 animate-spin text-slate-600" />
+                      </div>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </>
