@@ -37,7 +37,11 @@ class DepartmentService {
         return $this->department->find($id);
     }
     
-    public function getAllDepartments(int $page = 1, int $perpage = 10) {
+    public function getAllDepartments(int $page = 1, int $perpage = 10, string $query = '') {
+
+        if($query) return $this->department->where('name', 'like', "%{$query}%")
+                                    ->paginate($perpage, ['*'], 'page', $page);
+        
         return $this->department->paginate($perpage, ['*'], 'page', $page);
     }
 

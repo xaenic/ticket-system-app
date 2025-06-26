@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, PlusIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { RowsPerPage } from "./RowsPerPage";
 
@@ -32,8 +32,11 @@ interface DataTableProps<TData, TValue> {
   from: number;
   to: number;
   isLoading: boolean;
+  query: string;
+  tableTitle: string;
   onPageChange: (page: number) => void;
   onPerPageChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -46,8 +49,11 @@ export function DataTable<TData, TValue>({
   to,
   lastPage,
   isLoading,
+  query,
+  tableTitle,
   onPageChange,
   onPerPageChange,
+  onSearchChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -65,9 +71,19 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="rounded-md border-none bg-white ">
-      <div className="flex p-4">
+      <div className="flex p-4 justify-between items-center">
         <div>
-          <Input placeholder="Search departments..." />
+          <Input
+            value={query}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search..."
+          />
+        </div>
+        <div>
+          <Button size={"sm"} variant={"default"}>
+            <PlusIcon />
+            New {tableTitle}
+          </Button>
         </div>
       </div>
       <Table>
@@ -124,7 +140,7 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results. {page - 1}
+                No results
               </TableCell>
             </TableRow>
           )}

@@ -1,4 +1,5 @@
 import { DataTable } from "@/components/dashboard/data-table";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { IDepartment } from "@/interfaces/IDepartment";
 import { type IResponse } from "@/interfaces/IResponse";
 import { getDepartments } from "@/services/department.service";
@@ -10,6 +11,9 @@ import { useState } from "react";
 const Department = () => {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState("10");
+  const [query, setQuery] = useState("");
+
+  const debouncedQuery = useDebounce(query, 200);
   const columns: ColumnDef<IDepartment>[] = [
     {
       accessorKey: "name",
@@ -34,8 +38,8 @@ const Department = () => {
   ];
 
   const { data, isLoading } = useQuery<IResponse<IDepartment>, Error>({
-    queryKey: ["departments", page, perPage],
-    queryFn: () => getDepartments(page, perPage),
+    queryKey: ["departments", page, perPage, debouncedQuery],
+    queryFn: () => getDepartments(page, perPage, debouncedQuery),
     staleTime: 5000,
   });
 
@@ -53,6 +57,8 @@ const Department = () => {
       </div>
 
       <DataTable<IDepartment, ColumnDef<IDepartment>>
+        onSearchChange={setQuery}
+        query={query}
         columns={columns}
         isLoading={isLoading}
         data={data?.data || []}
@@ -64,6 +70,7 @@ const Department = () => {
         perPage={perPage}
         onPageChange={setPage}
         onPerPageChange={setPerPage}
+        tableTitle="Department"
       />
     </main>
   );
