@@ -66,7 +66,7 @@ class TicketService {
 
         $ticketQuery = Ticket::query();
 
-        if($query)      $ticketQuery->where('assigned_user_id',$id)->where('title', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
+        if($query)      $ticketQuery->where('title', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
 
         if($status)     $ticketQuery->where('status', $status);
         
@@ -76,7 +76,7 @@ class TicketService {
         
         if($role === 'client') $ticketQuery->where('client_id',$id);
 
-         return $ticketQuery->paginate($perpage, ['*'], 'page', $page);
+         return $ticketQuery->with('department')->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getRecentTickets(int $limit = 5) {

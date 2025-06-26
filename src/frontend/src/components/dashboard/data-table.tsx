@@ -22,6 +22,7 @@ import { ChevronLeft, ChevronRight, Loader2, PlusIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { RowsPerPage } from "./RowsPerPage";
 import { DialogTrigger } from "../ui/dialog";
+import type React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -38,7 +39,8 @@ interface DataTableProps<TData, TValue> {
   onPageChange: (page: number) => void;
   onPerPageChange: (value: string) => void;
   onSearchChange: (value: string) => void;
-  onAddClick: () => void;
+  onAddClick?: () => void;
+  SideButton?: React.FC;
 }
 
 export function DataTable<TData, TValue>({
@@ -57,6 +59,7 @@ export function DataTable<TData, TValue>({
   onPerPageChange,
   onSearchChange,
   onAddClick,
+  SideButton,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -83,12 +86,16 @@ export function DataTable<TData, TValue>({
           />
         </div>
         <div>
-          <DialogTrigger asChild>
-            <Button size={"sm"} onClick={onAddClick} variant={"default"}>
-              <PlusIcon />
-              New {tableTitle}
-            </Button>
-          </DialogTrigger>
+          {tableTitle != "" && (
+            <DialogTrigger asChild>
+              <Button size={"sm"} onClick={onAddClick} variant={"default"}>
+                <PlusIcon />
+                New {tableTitle}
+              </Button>
+            </DialogTrigger>
+          )}
+
+          {SideButton && <SideButton />}
         </div>
       </div>
       <Table>

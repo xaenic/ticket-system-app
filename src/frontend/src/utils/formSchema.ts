@@ -39,3 +39,17 @@ export const updateAgentSchema = z.object({
     .string()
     .min(1, { message: "Department is required" }),
 });
+
+export const TicketSchema = z.object({
+  title: z.string().min(2, {
+    message: "Title must be at least 2 characters"
+  }).max(100),
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters"
+  }).max(1000),
+  priority: z.enum(["low", "medium", "high"]),
+  department_id: z.coerce
+    .string()
+    .min(1, { message: "Department is required" }),
+  attachments: z.any().optional(),
+});

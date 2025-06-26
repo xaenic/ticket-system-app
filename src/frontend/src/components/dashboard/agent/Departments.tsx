@@ -9,10 +9,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { IDepartment } from "@/interfaces/IDepartment";
-export function Departments({ departments }: { departments: IDepartment[] }) {
+export function Departments({
+  departments,
+  width = "w-[180px]",
+}: {
+  departments: IDepartment[];
+  width?: string;
+}) {
   return (
     <>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className={`${width}`}>
         <SelectValue placeholder="Select a department" />
       </SelectTrigger>
       <SelectContent>
@@ -20,9 +26,12 @@ export function Departments({ departments }: { departments: IDepartment[] }) {
           <SelectLabel>Departments</SelectLabel>
 
           {departments.map((dept) => (
-            <SelectItem key={dept.id+""} value={dept.id}>
+            <SelectItem
+              key={dept.id + ""}
+              value={dept.id.toString()}
+              className="text-black"
+            >
               {dept.name}
-
             </SelectItem>
           ))}
         </SelectGroup>

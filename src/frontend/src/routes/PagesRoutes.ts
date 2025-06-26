@@ -21,7 +21,11 @@ export const ClientRoutes = [
     component: lazy(() => import("@/pages/client/Dashboard")),
   },
   {
-    path: "departments",
-    component: lazy(() => import("@/pages/client/Department")),
+    path: "tickets",
+    component: lazy(() => import("@/pages/client/Ticket")),
+  },
+  {
+    path: "tickets/add",
+    component: lazy(() => import("@/pages/client/AddTicket")),
   },
 ];

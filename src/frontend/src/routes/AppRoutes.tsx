@@ -8,6 +8,7 @@ import { AdminRoutes, ClientRoutes } from "./PagesRoutes";
 import { Suspense } from "react";
 import { PageLoader } from "@/components/ui/pageLoader";
 import { AdminLayout } from "@/layouts/AdminLayout";
+import { ClientLayout } from "@/layouts/ClientLayout";
 
 export default function AppRoutes() {
   return (
@@ -28,7 +29,7 @@ export default function AppRoutes() {
           </Route>
         </Route>
         <Route path="client" element={<ProtectedRoute role="client" />}>
-          <Route element={<AdminLayout />}>
+          <Route element={<ClientLayout />}>
             {ClientRoutes.map((route, index) => {
               const Page = route.component;
               return <Route key={index} path={route.path} element={<Page />} />;
