@@ -43,6 +43,9 @@ Route::prefix('users')
     ->group(function () {
 
         Route::get('/', [UserController::class, 'index']);
+        Route::get('/agents', [UserController::class, 'agents']);
+
+        //create agents
         Route::post('/', [UserController::class, 'store']);
 
         Route::delete('/{id}', [UserController::class, 'destroy'])->where('id', '[0-9]+');

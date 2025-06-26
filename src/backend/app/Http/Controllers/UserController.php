@@ -30,6 +30,17 @@ class UserController extends Controller
         , 200);
     }
 
+    public function agents(Request $request) {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $query = $request->query('query',"");
+
+        $results = $this->userService->getAllAgents($page, $perPage, $query); 
+        return response()->json(
+            $results
+        , 200);
+    }
+
     /*
         For creating new Agents.
     */
@@ -62,7 +73,8 @@ class UserController extends Controller
         $request->validated();
 
         $data =  [
-            'name' => $request->getName()
+            'name' => $request->getName(),
+            'department_id' => $request->getDepartmentId()
         ];
         $results = $this->userService->updateUser($id, $data);
         return response()->json([
