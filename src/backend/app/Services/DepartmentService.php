@@ -37,8 +37,8 @@ class DepartmentService {
         return $this->department->find($id);
     }
     
-    public function getAllDepartments() {
-        return $this->department->all();
+    public function getAllDepartments(int $page = 1, int $perpage = 10) {
+        return $this->department->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getDepartmentCounts() {

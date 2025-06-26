@@ -25,10 +25,9 @@ class UserController extends Controller
     public function index() {
     
         $results = $this->userService->getAllUsers(); 
-        return response()->json([
-            'status' => 'success',
-            'data' => $results,
-        ], 200);
+        return response()->json(
+            $results
+        , 200);
     }
 
     /*
@@ -65,7 +64,7 @@ class UserController extends Controller
         $data =  [
             'name' => $request->getName()
         ];
-        $results = $this->userService->updateDepartment($id, $data);
+        $results = $this->userService->updateUser($id, $data);
         return response()->json([
             'status' => 'success',
             'message' => "User not found",

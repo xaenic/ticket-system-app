@@ -48,8 +48,8 @@ class userService {
     public function getUserByEmail(string $email) {
         return $this->user->where('email', $email)->first();
     }
-    public function getAllUsers() {
-        return $this->user->all();
+    public function getAllUsers(int $page = 1, int $perpage = 10) {
+        return $this->user->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getUserCountsByRole(string $role) {

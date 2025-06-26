@@ -21,14 +21,12 @@ class DepartmentController extends Controller
         $this->middleware(['auth:api', 'role:admin'], ['except' => ['index']]);
     }
 
-    public function index() {
-    
-        $results = $this->departmentService->getAllDepartments(); 
+    public function index(Request $request) {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $results = $this->departmentService->getAllDepartments($page, $perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $results,
-        ], 200);
+        return response()->json($results, 200);
     }
 
     public function store(DepartmentRequest $request) {

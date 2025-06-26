@@ -42,7 +42,7 @@ Route::prefix('departments')
 Route::prefix('users')
     ->group(function () {
 
-        Route::get('/', [UserController::class, 'userTickets']);
+        Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
 
         Route::delete('/{id}', [UserController::class, 'destroy'])->where('id', '[0-9]+');

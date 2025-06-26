@@ -27,10 +27,7 @@ class TicketController extends Controller
     public function index() {
     
         $results = $this->ticketService->getAllTickets('admin'); 
-        return response()->json([
-            'status' => 'success',
-            'data' => $results,
-        ], 200);
+        return response()->json($results, 200);
     }
 
     public function store(TicketRequest $request) {

@@ -46,15 +46,15 @@ class TicketService {
         return $this->ticket->with('responses')->find($id);
     }
 
-    public function getAlltickets(string $role, int $id = null) {
+    public function getAlltickets(string $role, int $id = null, int $page = 1, int $perpage = 10) {
         if(!$id && $role === 'admin') {
-            return $this->ticket->all();
+            return $this->ticket->paginate($perpage, ['*'], 'page', $page);
         }
         if($role === 'agent') {
-            return $this->ticket->where('agent_id', $id)->get();
+            return $this->ticket->where('agent_id', $id)->paginate($perpage, ['*'], 'page', $page);
         }
         if($role === 'client') 
-        return $this->ticket->where('client_id', $id)->get();
+        return $this->ticket->where('client_id', $id)->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getRecentTickets(int $limit = 5) {
