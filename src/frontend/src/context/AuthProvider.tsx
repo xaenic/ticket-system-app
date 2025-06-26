@@ -5,7 +5,7 @@ import {
   checkStatus,
   clearAuthState,
   loginService,
-  logoutService,
+
   storeAuthState,
 } from "@/services/auth.service";
 import type { IUser } from "@/interfaces/IUser";
@@ -41,18 +41,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-
-      const { user, token } = await loginService(email, password);
-      setUser(user);
-      setIsAuthenticated(true);
-      if (token) storeAuthState(token);
-  
+    const { user, token } = await loginService(email, password);
+    setUser(user);
+    setIsAuthenticated(true);
+    if (token) storeAuthState(token);
   };
 
   const logout = async () => {
     try {
       setIsLoading(true);
-      await logoutService();
+     
       setUser(null);
       setIsAuthenticated(false);
       // Clear auth state from localStorage

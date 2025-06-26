@@ -28,7 +28,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">Open</span>
             </div>
-            <span className="text-sm font-semibold">{stats.openTicketsCount}</span>
+            <span className="text-sm font-semibold">{stats?.openTicketsCount}</span>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -38,7 +38,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
                 Resolved
               </span>
             </div>
-            <span className="text-sm font-semibold">{stats.closedTicketsCount}</span>
+            <span className="text-sm font-semibold">{stats?.closedTicketsCount}</span>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
@@ -46,7 +46,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">Pending</span>
             </div>
-            <span className="text-sm font-semibold">{stats.pendingTicketsCount}</span>
+            <span className="text-sm font-semibold">{stats?.pendingTicketsCount}</span>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
@@ -54,7 +54,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">Urgent</span>
             </div>
-            <span className="text-sm font-semibold">{stats.urgentTicketsCount}</span>
+            <span className="text-sm font-semibold">{stats?.urgentTicketsCount}</span>
           </div>
         </div>
 
@@ -64,7 +64,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
           <span className="text-sm font-semibold text-gray-800">
             Total Tickets
           </span>
-          <span className="text-lg font-bold text-blue-600">{stats.totalTicketsCount}</span>
+          <span className="text-lg font-bold text-blue-600">{stats?.totalTicketsCount}</span>
         </div>
       </CardContent>
     </Card>

@@ -13,7 +13,7 @@ export const AdminLayout = () => {
     {
       title: "Departments",
       icon: <Building2 size={22} />,
-      url: "clients",
+      url: "departments",
     },
 
     {
