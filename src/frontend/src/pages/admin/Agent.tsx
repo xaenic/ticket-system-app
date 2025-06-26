@@ -1,5 +1,3 @@
-import { UpdateDepartment } from "@/components/dashboard/department/UpdateDepartment";
-import { AddDepartment } from "@/components/dashboard/department/AddDepartment";
 import { DataTable } from "@/components/dashboard/data-table";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { IDepartment } from "@/interfaces/IDepartment";
@@ -9,21 +7,30 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import { columns } from "../../components/dashboard/department/ColumnsDepartment";
-import { DeleteDepartment } from "@/components/dashboard/department/DeleteDepartment";
+import { columns } from "@/components/dashboard/agent/ColumnsAgent";
+import { AddAgent } from "@/components/dashboard/agent/AddAgent";
+import { getAgents } from "@/services/agent.service";
+import type { IUser } from "@/interfaces/IUser";
+import { UpdateAgent } from "@/components/dashboard/agent/UpdateAgent";
+import { DeleteAgent } from "@/components/dashboard/agent/DeleteAgent";
 
-const Department = () => {
+const Agent = () => {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState("10");
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [active, setActive] = useState<"add" | "edit" | "delete">("add");
-  const [department, setDepartment] = useState<IDepartment | null>(null);
+  const [agent, setAgent] = useState<IUser | null>(null);
   const debouncedQuery = useDebounce(query, 200);
 
-  const { data, isLoading } = useQuery<IResponse<IDepartment>, Error>({
+  const { data, isLoading } = useQuery<IResponse<IUser>, Error>({
+    queryKey: ["agents", page, perPage, debouncedQuery],
+    queryFn: () => getAgents(page, perPage, debouncedQuery),
+    staleTime: 5000,
+  });
+  const { data: departments } = useQuery<IResponse<IDepartment>, Error>({
     queryKey: ["departments", page, perPage, debouncedQuery],
-    queryFn: () => getDepartments(page, perPage, debouncedQuery),
+    queryFn: () => getDepartments(page, "150", debouncedQuery),
     staleTime: 5000,
   });
 
@@ -31,16 +38,17 @@ const Department = () => {
     setActive("add");
   };
 
-  const handleUpdate = (department: IDepartment) => {
-    // alert(department.name);
+  const handleUpdate = (user: IUser) => {
     setActive("edit");
-    setDepartment(department);
+    console.log(user);
+    setAgent(user);
   };
 
   const handleDelete = (id: string) => {
-    setDepartment({
+    setAgent({
       id: id,
       name: "",
+      email: "",
     });
     setActive("delete");
   };
@@ -48,14 +56,14 @@ const Department = () => {
     <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your departments effectively
+            Manage your agents effectively
           </p>
         </div>
       </div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DataTable<IDepartment, ColumnDef<IDepartment>>
+        <DataTable<IUser, ColumnDef<IDepartment>>
           onSearchChange={setQuery}
           query={query}
           columns={columns({ onDelete: handleDelete, onEdit: handleUpdate })}
@@ -70,19 +78,26 @@ const Department = () => {
           onPageChange={setPage}
           onPerPageChange={setPerPage}
           onAddClick={handleAdd}
-          tableTitle="Department"
+          tableTitle="Agent"
         />
 
         {active === "add" ? (
-          <AddDepartment setIsOpen={setIsOpen} />
+          <AddAgent
+            setIsOpen={setIsOpen}
+            departments={departments?.data || []}
+          />
         ) : active === "edit" ? (
-          <UpdateDepartment department={department} setIsOpen={setIsOpen} />
+          <UpdateAgent
+            agent={agent}
+            departments={departments?.data || []}
+            setIsOpen={setIsOpen}
+          />
         ) : (
-          <DeleteDepartment setIsOpen={setIsOpen} department={department} />
+          <DeleteAgent setIsOpen={setIsOpen} user={agent} />
         )}
       </Dialog>
     </main>
   );
 };
 
-export default Department;
+export default Agent;

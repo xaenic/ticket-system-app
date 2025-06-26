@@ -95,21 +95,23 @@ export function DataTable<TData, TValue>({
         <TableHeader className="bg-slate-100 ">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow className="border-none p-4" key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    className="p-4 font-medium text-slate-800"
-                    key={header.id}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers
+                .filter((header) => !header.column.columnDef.enableHiding)
+                .map((header) => {
+                  return (
+                    <TableHead
+                      className="p-4 font-medium text-slate-800"
+                      key={header.id}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
             </TableRow>
           ))}
         </TableHeader>
@@ -138,11 +140,17 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell className=" p-4" key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row
+                  .getVisibleCells()
+                  .filter((h) => !h.column.columnDef.enableHiding)
+                  .map((cell) => (
+                    <TableCell className=" p-4" key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
               </TableRow>
             ))
           ) : (
