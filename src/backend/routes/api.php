@@ -77,8 +77,6 @@ Route::prefix('tickets')
             ->group(function() {
                 Route::get('/{id}', [TicketResponseController::class, 'index']);
                 Route::post('/', [TicketResponseController::class, 'store']);
-                Route::delete('/{id}', [TicketResponseController::class, 'destroy'])->where('id', '[0-9]+');
-                Route::put('/{id}', [TicketResponseController::class, 'update'])->where('id', '[0-9]+');
         });
 });
 Route::get('/test', function () {

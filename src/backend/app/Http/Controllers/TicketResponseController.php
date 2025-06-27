@@ -49,25 +49,4 @@ class TicketResponseController extends Controller
         ], 201);
     }
     
-    public function destroy($id) {
-     
-        $results = $this->ticketResponseService->deleteResponse($id);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => "Response Not Found",
-        ], $results ? 204 : 404);
-    }
-
-    public function update(TicketResponseRequest $request, $id) {
-
-       
-        $data = $request->validated();
-        $results = $this->ticketResponseService->updateResponse($id, $data);
-        return response()->json([
-            'status' => 'success',
-            'message' => "Response not found",
-        ], $results ? 204 : 404);
-    }
-
 }
