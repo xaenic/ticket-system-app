@@ -20,7 +20,7 @@ class Attachment extends Model
     }
 
     public function response() {
-        return $this->belongsTo(TicketResponse::class);
+        return $this->belongsTo(TicketResponse::class,'response_id');
     }
 
     public function uploadedBy() {

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->enum('status', ['open', 'closed', 'pending', 'duplicate'])
-                ->default('pending')->change();
+            $table->enum('status', ['open', 'closed', 'in-progress', 'resolved'])
+                ->default('open')->change();
         });
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Validations\TicketValidation as TicketRequest;
 
-
+use Exception;
 
 use App\Services\TicketService;
 
@@ -21,7 +21,7 @@ class TicketController extends Controller
         $this->ticketService = $ticketService;
 
         $this->middleware(['auth:api']);
-        $this->middleware(['role:admin'], ['except' => ['userTickets','assign','store']]);
+        $this->middleware(['role:admin'], ['except' => ['userTickets','assign','store','show','update']]);
     }
 
     public function index() {
@@ -49,26 +49,30 @@ class TicketController extends Controller
         $results = $this->ticketService->deleteTicket($id);
 
         return response()->json([
-            'status' => 'success',
             'message' => "Ticket Not Found",
         ], $results ? 204 : 404);
     }
 
     public function update(TicketRequest $request, $id) {
 
-        $request->validated();
+        try {
 
-        $data =  [
-            'title' => $request->getTitle(),
-            'description' => $request->getDescription(),
-            'status' => $request->getStatus(),
-            'priority' => $request->getPriority(),
-        ];
-        $results = $this->ticketService->updateTicket($id, $data);
-        return response()->json([
-            'status' => 'success',
-            'message' => "Ticket not found",
-        ], $results ? 204 : 404);
+            $data = $request->validated();
+            $data['uploaded_by'] = auth()->id();
+                
+            $results = $this->ticketService->updateTicket($id, $data);
+
+            return response()->json([
+                  
+                    'message' => "Ticket not found",
+            ], $results ? 204 : 404);
+
+        }catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 400);
+        }
     }
 
 
@@ -85,14 +89,15 @@ class TicketController extends Controller
     }
 
     public function show($id) {
-        $ticket = $this->ticketService->getTicketById($id);
+        $userid = auth()->id();
+        $ticket = $this->ticketService->getTicketById($id, $userid);
         if (!$ticket) {
             return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $ticket,
+            'data' => [$ticket],
         ], 200);
     }
 
@@ -111,4 +116,5 @@ class TicketController extends Controller
 
         return response()->json($results , 200);
     }
+    
 }

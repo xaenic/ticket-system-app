@@ -19,7 +19,8 @@ class UserController extends Controller
         
         $this->userService = $userService;
 
-        $this->middleware(['auth:api', 'role:admin']);
+        $this->middleware(['auth:api']);
+         $this->middleware('role:admin')->except(['openedTickets']);
     }
 
     public function index() {
@@ -94,5 +95,18 @@ class UserController extends Controller
         $result = $this->userService->assignDepartment($id, $request->getDepartmentId());
 
         return response()->json(['status' => 'success', 'message' => 'Department assigned successfully'], 200);
+    }
+
+
+    public function openedTickets(Request $request) {
+
+        $id = auth()->id();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $query = $request->query('query',"");
+
+        $result = $this->userService->getOpenedTickets($id, $page, $perPage, $query);
+
+        return response()->json($result, 200);
     }
 }

@@ -18,8 +18,11 @@ class TicketValidation extends FormRequest
             'status' => ['sometimes', 'in:pending,open,closed,duplicate'],
             'priority' => ['required', 'in:low,medium,high'],
             'department_id' => ['required', 'exists:departments,id'],
+            'deleted_files' => ['nullable', 'array'],
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,docx,txt', 'max:10240'],
+            'new_attachments' => ['nullable', 'array'],
+            'new_attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,docx,txt', 'max:10240'],
         ];
 
     }

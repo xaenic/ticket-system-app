@@ -35,13 +35,17 @@ class TicketResponseController extends Controller
     }
 
     public function store(TicketResponseRequest $request) {
-
+        
         $data = $request->validated();
+
+        $data['attachments'] = $request->file('attachments', []);
+        $data['uploaded_by'] = auth()->id();
 
         $results = $this->ticketResponseService->createResponse($data);
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
+        
         ], 201);
     }
     

@@ -79,4 +79,12 @@ class userService {
         return $this->user->role($role)->count();
     }
     
+    public function getOpenedTickets($id,int $page = 1, int $perpage = 10, $query = "") {
+        $user = $this->user->with('department')->findOrFail($id);
+        
+        $tickets =  $user->department ? $user->department->tickets()->where('status','open')->paginate($perpage, ['*'], 'page', $page) : collect() ;
+
+        return $tickets;
+    }
+    
 }

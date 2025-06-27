@@ -15,6 +15,8 @@ class TicketResponseValidation extends FormRequest
         return [
             'ticket_id' => ['required', 'int', 'exists:tickets,id'],
             'message' => ['required', 'string'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,docx,txt', 'max:10240'],
         ];
 
     }

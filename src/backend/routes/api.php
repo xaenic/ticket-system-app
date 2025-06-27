@@ -59,12 +59,14 @@ Route::prefix('tickets')
     ->group(function () {
 
         Route::get('/', [TicketController::class, 'userTickets']);
+        Route::get('/open', [UserController::class, 'openedTickets']);
         Route::get('/all', [TicketController::class, 'index']);
         Route::post('/', [TicketController::class, 'store']);
 
         Route::delete('/{id}', [TicketController::class, 'destroy'])->where('id', '[0-9]+');
-        Route::put('/{id}', [TicketController::class, 'update'])->where('id', '[0-9]+');
+        Route::post('/{id}', [TicketController::class, 'update'])->where('id', '[0-9]+');
         Route::patch('/{id}', [TicketController::class, 'assign'])->where('id', '[0-9]+');
+        Route::get('/{id}', [TicketController::class, 'show'])->where('id', '[0-9]+');
 
 
         Route::prefix('responses')

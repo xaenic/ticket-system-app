@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained('tickets')->nullable()->onDelete('cascade');
-            $table->foreignId('response_id')->nullable()->constrained('ticket_responses')->onDelete('cascade');
+            $table->foreignId('ticket_response_id')->nullable()->constrained('ticket_responses')->onDelete('cascade');
             $table->string('filename'); 
             $table->string('file_path'); 
             $table->string('mime_type'); 

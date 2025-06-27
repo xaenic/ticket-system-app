@@ -65,4 +65,6 @@ class DepartmentController extends Controller
             'message' => "Department not found",
         ], $results ? 204 : 404);
     }
+
+
 }
