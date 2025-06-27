@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $this->ticketService = $ticketService;
         $this->userService = $userService;
 
-        $this->middleware(['auth:api', 'role:admin']);
+        $this->middleware(['auth:api']);
     }
 
     public function index() {
@@ -52,6 +52,27 @@ class DashboardController extends Controller
                         'totalTicketsCount' => $totalTickets,
                         'agentsCount' => $agentsCount,
                         'clientsCount' => $clientsCount,
+                ],
+                'recents' => $recents
+            ]
+        ], 200);
+    }
+
+     public function agent() {
+
+        $resolved = $this->ticketService->getTicketCountByStatus('resolved');
+        $inProgress = $this->ticketService->getTicketCountByStatus('in-progress');
+        $totalTickets = $this->ticketService->getTicketCounts();
+
+        $recents = $this->ticketService->getRecentTickets();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'stats'  =>[
+                        'resolved' => $resolved,
+                        'inProgress' => $inProgress,
+                        'totalTickets' => $totalTickets,
                 ],
                 'recents' => $recents
             ]

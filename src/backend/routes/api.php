@@ -54,6 +54,8 @@ Route::prefix('users')
 
 });
 Route::get('/dashboard', [DashboardController::class, 'index']);
+Route::get('/dashboard/agent', [DashboardController::class, 'agent']);
+Route::get('/dashboard/client', [DashboardController::class, 'agent']);
 
 Route::prefix('tickets')
     ->group(function () {

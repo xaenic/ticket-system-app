@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Building2, ChartColumnBigIcon, Ticket, UserPlus, UsersRound } from "lucide-react";
+import { Building2, ChartColumnBigIcon, Ticket,  UsersRound } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 export const AdminLayout = () => {
@@ -20,12 +20,8 @@ export const AdminLayout = () => {
       title: "Agents",
       icon: <UsersRound size={20} />,
       url: "agents",
-    },
-    {
-      title: "Clients",
-      icon: <UserPlus size={22} />,
-      url: "clients",
-    },
+    },  
+
     {
       title: "Tickets",
       icon: <Ticket size={24} />,

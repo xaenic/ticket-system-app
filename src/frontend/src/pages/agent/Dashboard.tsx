@@ -1,18 +1,18 @@
 import { useAuth } from "@/hooks/useAuth";
 
-import { Ticket, Calendar, Building2, User, Users2 } from "lucide-react";
+import { Ticket, Calendar, Building2, User, Users2, CircleCheckBig, TrendingUp } from "lucide-react";
 import { Widget } from "@/components/dashboard/Widget";
 import { TicketStatus } from "@/components/dashboard/TicketStatus";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import { useQuery } from "@tanstack/react-query";
-import { getDashboardData } from "@/services/dashboard.service";
+import { getAgentDashboard } from "@/services/dashboard.service";
 
 const Dashboard = () => {
   const { user } = useAuth();
 
   const { data } = useQuery({
     queryKey: ["dashboard"],
-    queryFn: getDashboardData,
+    queryFn: getAgentDashboard,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
   const stats = [
@@ -20,26 +20,21 @@ const Dashboard = () => {
       icon: <Ticket className="h-6 w-6 text-blue-600" />,
       subText: "Total Tickets",
       title: "Tickets",
-      count: data?.stats?.totalTicketsCount || 0,
+      count: data?.stats?.totalTickets || 0,
     },
     {
-      icon: <Building2 className="h-6 w-6 text-orange-600" />,
-      subText: "Number of Departments",
-      title: "Departments",
+      icon: <TrendingUp className="h-6 w-6 text-orange-600" />,
+      subText: "Number of In-Progress Tickets",
+      title: "In-Progress",
       count: data?.stats?.departmentCount || 0,
     },
     {
-      icon: <User className="h-6 w-6 text-purple-600" />,
-      subText: "Active Clients",
-      title: "Clients",
-      count: data?.stats?.clientsCount || 0,
+      icon: <CircleCheckBig className="h-6 w-6 text-green-600" />,
+      subText: "Number of resolved tickets",
+      title: "Resolved",
+      count: data?.stats?.resolved || 0,
     },
-    {
-      icon: <Users2 className="h-6 w-6 text-yellow-600" />,
-      subText: "Active Agents",
-      title: "Agents",
-      count: data?.stats?.agentsCount || 0,
-    },
+
   ];
   return (
     <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
@@ -69,8 +64,10 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <TicketStatus stats={data?.stats} />
-        <RecentActivity />
+        <RecentActivity
+        
+        recents={data?.recents || []}
+        subtitle="Latest update from your works"/>
       </div>
     </main>
   );

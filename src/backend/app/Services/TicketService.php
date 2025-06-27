@@ -83,8 +83,9 @@ class TicketService {
         }
 
         $user_id = auth()->id();
-
-        if($user_id != $ticket->assigned_user_id) {
+        $role = auth()->user()->getRoleNames()->first();
+        
+        if($user_id != $ticket->assigned_user_id && $role != "admin") {
             throw new \Exception('Only the assigned agent can update the ticket status.');
         }
         if($ticket-> status != 'in-progress' && $ticket->status != 'open') {
@@ -133,15 +134,32 @@ class TicketService {
     }
 
     public function getRecentTickets(int $limit = 5) {
-        return $this->ticket->orderBy('created_at', 'desc')->take($limit)->get();
+
+        $id = auth()->id();
+        $role = auth()->user()->getRoleNames()->first();
+
+        if($role == "admin") {
+            return $this->ticket->orderBy('created_at', 'desc')->take($limit)->get();
+        }
+        return $this->ticket->with('client')->where('client_id', $id)->orWhere('assigned_user_id',$id)->orderBy('updated_at', 'desc')->take($limit)->get();
     }
 
     public function getTicketCounts() {
-        return $this->ticket->count();
+
+        $id = auth()->id(); 
+        $role = auth()->user()->getRoleNames()->first();
+        if($role == "admin")
+            return $this->ticket->count();
+        return $this->ticket->where('client_id', $id)->orWhere('assigned_user_id',$id)->count();
     }
 
     public function getTicketCountByStatus(string $status) {
-        return $this->ticket->where('status', $status)->count();
+        $role = auth()->user()->getRoleNames()->first();
+        if($role == "admin")
+            return $this->ticket->where('status', $status)->count();
+
+        $id = auth()->id(); 
+        return $this->ticket->where('assigned_user_id',$id)->count();
     }
 
     public function getTicketCountByPriority(string $priority) {

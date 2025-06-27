@@ -13,6 +13,14 @@ export const AdminRoutes = [
     path: "agents",
     component: lazy(() => import("@/pages/admin/Agent")),
   },
+  {
+    path: "tickets",
+    component: lazy(() => import("@/pages/admin/Ticket")),
+  },
+  {
+    path: "tickets/:id",
+    component: lazy(() => import("@/pages/admin/ViewTicket")),
+  },
 ];
 
 export const ClientRoutes = [
