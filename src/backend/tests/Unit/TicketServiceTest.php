@@ -9,6 +9,7 @@ use App\Models\TicketResponse;
 use App\Models\User;
 use App\Models\Ticket;
 use App\Models\Department;
+use App\Models\Attachment;
 
 use App\Services\TicketResponseService;
 use App\Services\TicketService;
@@ -74,7 +75,7 @@ class TicketServiceTest extends TestCase
         
         $this->assertNotNull($result);
     }
-
+    
     public function test_create_ticket_with_attachments()
     {
        
@@ -91,6 +92,7 @@ class TicketServiceTest extends TestCase
             'uploaded_by' => $user->id,
             'priority' => 'low',
             'status' => 'in-progress',
+            'attachments' => [$file],
             'department_id' => $department->id,
             'client_id' => $user->id,
         ]);
@@ -123,6 +125,91 @@ class TicketServiceTest extends TestCase
 
         $this->assertNotNull($result);
         $this->assertEquals('Test Ticket Update', $result->title);
+    }
+    public function test_update_ticket_with_attachments_successfully()
+    {
+        $user = User::factory()->create();
+        $department = Department::factory()->create();
+        $this->actingAs($user);
+        
+        $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+        $ticket = $this->service->createTicket([
+            'title' => 'Test Ticket',
+            'description' => 'Test Description',
+            'uploaded_by' => $user->id,
+            'priority' => 'low',
+            'status' => 'open',
+           
+            'department_id' => $department->id,
+            'client_id' => $user->id,
+        ]);
+
+        $result = $this->service->updateTicket($ticket->id, [
+            'title' => 'Test Ticket Update',
+             'new_attachments' => [$file],
+             'uploaded_by' => $user->id
+        ]);
+
+
+        $this->assertNotNull($result);
+        $this->assertEquals('Test Ticket Update', $result->title);
+    }
+    public function test_update_ticket_delete_attachments()
+    {
+        $user = User::factory()->create();
+        $department = Department::factory()->create();
+        $this->actingAs($user);
+        
+        $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+        $ticket = $this->service->createTicket([
+            'title' => 'Test Ticket',
+            'description' => 'Test Description',
+            'uploaded_by' => $user->id,
+            'priority' => 'low',
+            'status' => 'open',
+            'attachments' => [$file],
+            'department_id' => $department->id,
+            'client_id' => $user->id,
+        ]);
+
+
+        $attachment = $ticket->attachments()->first();
+        $result = $this->service->updateTicket($ticket->id, [
+            'title' => 'Test Ticket Update',
+            'deleted_files' => [$attachment->id],
+        ]);
+
+        $this->assertDatabaseMissing('attachments', [
+        'id' => $attachment->id,
+        ]);
+    }
+    
+    public function test_non_owner_update_ticket()
+    {
+
+        $this->expectException(AuthorizationException::class);
+        
+        $user = User::factory()->create();
+        $user_2 = User::factory()->create();
+        $department = Department::factory()->create();
+  
+
+
+        $this->actingAs($user);
+
+        $ticket = $this->service->createTicket([
+            'title' => 'Test Ticket',
+            'description' => 'Test Description',
+            'uploaded_by' => $user_2->id,
+            'priority' => 'low',
+            'status' => 'open',
+            'department_id' => $department->id,
+            'client_id' => $user_2->id,
+        ]);
+
+        $result = $this->service->updateTicket($ticket->id, [
+            'title' => 'Test Ticket Update',
+        ]);
     }
 
     public function test_update_ticket_not_found()
@@ -202,6 +289,7 @@ class TicketServiceTest extends TestCase
         $this->assertEquals($agent->id, $result->assigned_user_id);
 
     }
+    
 
     public function test_assign_agent_throws_exception_when_already_assigned()
     {
@@ -319,26 +407,29 @@ class TicketServiceTest extends TestCase
     public function test_update_ticket_status_throws_exception_when_invalid_status()
     {
         $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Only pending or open tickets can be updated.');
 
         $user = User::factory()->create();
         $department = Department::factory()->create();
         $agent = User::factory()->create([
             "department_id" => $department->id
         ]);
+        
 
-        $this->actingAs($user);
+        $this->actingAs($agent);
         
         $ticket = $this->service->createTicket([
             'title' => 'Test Ticket',
             'description' => 'Test Description',
             'uploaded_by' => $user->id,
             'priority' => 'low',
-            'status' => 'closed',
+            'status' => 'resolved',
             'department_id' => $department->id,
             'client_id' => $user->id,
+            'assigned_user_id' => $agent->id,
         ]);
 
-        $this->service->updateTicketStatus('closed', $ticket->id);
+        $this->service->updateTicketStatus('open', $ticket->id);
     }
 
     public function test_get_ticket_by_id_successfully()

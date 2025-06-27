@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Attachment;
 
 trait HandleFileUploads
 {
@@ -23,9 +23,9 @@ trait HandleFileUploads
                     ]);
                 }
     }
-    public function deleteAttachments($data,$ticket) {
+    public function deleteAttachments($data) {
         foreach ($data['deleted_files'] as $fileId) {
-            $ticket->attachments()->where('id', $fileId)->delete();
+            Attachment::where('id', $fileId)->delete();
         }
 
     }

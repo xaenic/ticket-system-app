@@ -50,7 +50,7 @@ class TicketService {
             $this->uploadAttachments($data, $ticket);
         }
         if(isset($data['deleted_files'])) {
-            $this->deleteAttachments($data,$ticket);
+            $this->deleteAttachments($data);
         }
        $ticket->update($data);
         return $ticket;
@@ -64,9 +64,6 @@ class TicketService {
 
 
         $user = User::find($agent_id);
-        if(!$user) {
-            throw new ModelNotFoundException('User is not an agent.');
-        }
 
         if($user->department_id != $ticket->department_id) {
             throw new AuthorizationException('Agent does not belong to the same department as the ticket.');
@@ -91,7 +88,7 @@ class TicketService {
         if($user_id != $ticket->assigned_user_id && $role != "admin") {
             throw new AuthorizationException('Only the assigned agent can update the ticket status.');
         }
-        if($ticket-> status != 'in-progress' && $ticket->status != 'open') {
+        if($ticket->status != 'in-progress' && $ticket->status != 'open') {
             throw new AuthorizationException('Only pending or open tickets can be updated.');
         }
         $ticket->status = $status;
