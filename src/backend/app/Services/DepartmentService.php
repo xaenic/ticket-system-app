@@ -6,6 +6,9 @@ namespace App\Services;
 
 use App\Models\Department;
 
+use Exception;
+
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DepartmentService {
 
@@ -24,17 +27,28 @@ class DepartmentService {
 
         $department = $this->department->find($id);
 
-        if(!$department) return null;
+        if(!$department) throw new ModelNotFoundException("Department Not Found");
+        $department->update($data);
         
-        return $department->update($data);
+        return $department;
     }
 
     public function deleteDepartment(int $id) {
-        return $this->department->find($id)->delete();
+
+        $result = $this->department->find($id);
+
+        if(!$result) throw new ModelNotFoundException("Department Not Found");
+
+        return  $result->delete();
     }
     
     public function getDepartmentById(int $id) {
-        return $this->department->find($id);
+
+        $result = $this->department->find($id);
+
+        if(!$result) throw new ModelNotFoundException("Department Not Found");
+            
+        return $result;
     }
     
     public function getAllDepartments(int $page = 1, int $perpage = 10, string $query = '') {

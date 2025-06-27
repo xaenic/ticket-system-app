@@ -8,6 +8,9 @@ use App\Validations\DepartmentValidation as DepartmentRequest;
 
 use App\Services\DepartmentService;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+use Exception;
 class DepartmentController extends Controller
 {
     protected $departmentService;
@@ -22,48 +25,90 @@ class DepartmentController extends Controller
     }
 
     public function index(Request $request) {
-        $page = $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
-        $query = $request->query('query',"");
-        $results = $this->departmentService->getAllDepartments($page, $perPage,$query);
 
-        return response()->json($results, 200);
+        try{
+
+            $page = $request->query('page', 1);
+            $perPage = $request->query('per_page', 10);
+            $query = $request->query('query',"");
+
+            $results = $this->departmentService->getAllDepartments($page, $perPage,$query);
+
+            return response()->json($results, 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+      
     }
 
     public function store(DepartmentRequest $request) {
+
         $data = $request->validated();
+        try {
 
-        $results = $this->departmentService->createDepartment($data); 
+            $results = $this->departmentService->createDepartment($data); 
 
-        return response()->json([
-            'status' => 'success',
-        ], 201);
+            return response()->json([
+                'status' => 'success',
+            ], 201);
+
+        }catch(Exception $e) {
+               return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
     }
     
     public function destroy($id) {
      
-        $results = $this->departmentService->deleteDepartment($id);
+        try {
 
-        return response()->json([
-            'status' => 'success',
-            'message' => "Department Not Found",
-        ], $results ? 204 : 404);
+            $results = $this->departmentService->deleteDepartment($id);
+            return response()->json(null,204);
+
+        }catch (ModelNotFoundException $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        }catch(Exception $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+
+        }
+            
     }
 
     public function update(DepartmentRequest $request, $id) {
+        $data = $request->validated();
 
-        $request->validated();
+        try {
 
-        $data =  [
-            'name' => $request->getName()
-        ];
+            $results = $this->departmentService->updateDepartment($id, $data);
+            return response()->json(null,204);
 
+         }catch (ModelNotFoundException $e) {
 
-        $results = $this->departmentService->updateDepartment($id, $data);
-        return response()->json([
-            'status' => 'success',
-            'message' => "Department not found",
-        ], $results ? 204 : 404);
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        }catch(Exception $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+            
+        }
+
+        
     }
 
 
