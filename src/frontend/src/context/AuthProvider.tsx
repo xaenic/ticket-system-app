@@ -10,6 +10,7 @@ import {
 } from "@/services/auth.service";
 import type { IUser } from "@/interfaces/IUser";
 import { AuthContext } from "./AuthContext";
+import { Navigate } from "react-router-dom";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null);
@@ -45,6 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(user);
     setIsAuthenticated(true);
     if (token) storeAuthState(token);
+
+    <Navigate to={'/dashboard'} />
   };
 
   const logout = async () => {

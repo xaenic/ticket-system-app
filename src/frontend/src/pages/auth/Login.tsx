@@ -43,7 +43,7 @@ export function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate("/dashboard", { replace: true });
+      // navigate("/dashboard", { replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     }
