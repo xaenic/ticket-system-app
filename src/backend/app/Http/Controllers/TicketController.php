@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\Validations\TicketValidation as TicketRequest;
 use App\Validations\StatusValidation as StatusRequest;
@@ -32,26 +34,22 @@ class TicketController extends Controller
     }
 
     public function store(TicketRequest $request) {
-
         $data = $request->validated();
-        $data['attachments'] = $request->file('attachments', []);
-        $data['uploaded_by'] = auth()->id();
-  
-        
-        $results = $this->ticketService->createTicket($data);
-        
-        return response()->json([
-            'status' => 'success',
-        ], 201);
-    }
+        try {
+            $data['attachments'] = $request->file('attachments', []);
+            $data['uploaded_by'] = auth()->id();
     
-    public function destroy($id) {
-     
-        $results = $this->ticketService->deleteTicket($id);
-
-        return response()->json([
-            'message' => "Ticket Not Found",
-        ], $results ? 204 : 404);
+            $results = $this->ticketService->createTicket($data);
+            
+            return response()->json([
+                'status' => 'success',
+            ], 201);
+        }catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+        
     }
 
     public function update(TicketRequest $request, $id) {
@@ -68,67 +66,136 @@ class TicketController extends Controller
                     'message' => "Ticket not found",
             ], $results ? 204 : 404);
 
+        }catch(AuthorizationException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 403);
+        }
+        catch(ModelNotFoundException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 404);
         }catch(Exception $e) {
                 return response()->json([
                     'status' => 'error',
                     'message' => $e->getMessage(),
-                ], 400);
+                ], 500);
         }
     }
 
 
     public function assign($id) {
 
-        $ticket = $this->ticketService->getTicketById($id);
-        if (!$ticket) {
-            return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
-        }
-        $agent_id = auth()->id();
-        $result = $this->ticketService->assignAgent($agent_id,$id);
+        try {
+             $ticket = $this->ticketService->getTicketById($id);
+            if (!$ticket) {
+                return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
+            }
+            $agent_id = auth()->id();
+            $result = $this->ticketService->assignAgent($agent_id,$id);
 
-        return response()->json(['status' => 'success', 'message' => 'Agent assigned successfully'], 200);
+            return response()->json(['status' => 'success', 'message' => 'Agent assigned successfully'], 200);
+        } catch(AuthorizationException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 403);
+        }
+        catch(ModelNotFoundException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 404);
+        }catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 500);
+        }
+       
     }
 
     public function show($id) {
-        $userid = auth()->id();
-        $ticket = $this->ticketService->getTicketById($id, $userid);
-        if (!$ticket) {
-            return response()->json(['status' => 'error', 'message' => 'Ticket not found'], 404);
-        }
+        try {
+                $userid = auth()->id();
+                $ticket = $this->ticketService->getTicketById($id, $userid);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [$ticket],
-        ], 200);
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [$ticket],
+                ], 200);
+
+        }catch(ModelNotFoundException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 404);
+        }catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 500);
+        }
+        
     }
 
     public function userTickets(Request $request) {
 
-        $id = auth()->id();
+        try {
+                $id = auth()->id();
 
-        $page = $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
-        $query = $request->query('query',"");
-        $status = $request->query('status',"");
-        $priority = $request->query('priority',"");
+                $page = $request->query('page', 1);
+                $perPage = $request->query('per_page', 10);
+                $query = $request->query('query',"");
+                $status = $request->query('status',"");
+                $priority = $request->query('priority',"");
 
-        $role = auth()->user()->getRoleNames()->first();
-        $results = $this->ticketService->getAllTickets($role, $id, $page, $perPage, $query,$status,$priority);
+                $role = auth()->user()->getRoleNames()->first();
+                $results = $this->ticketService->getAllTickets($role, $id, $page, $perPage, $query,$status,$priority);
 
-        return response()->json($results , 200);
+                return response()->json($results , 200);
+
+        } catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 500);
+        }
+       
     }
 
     public function updateStatus(StatusRequest $request, $id) {
+        try {
+                $data = $request->validated();
 
-        $data = $request->validated();
+                $results = $this->ticketService->updateTicketStatus($data['status'],$id);
 
-        
-        $results = $this->ticketService->updateTicketStatus($data['status'],$id);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Ticket status updated successfully',
-        ], 200);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Ticket status updated successfully',
+                ], 200);
+        }
+        catch(AuthorizationException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 403);
+        }
+        catch(ModelNotFoundException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 404);
+        }
+        catch(Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 500);
+        }
+       
     }
     
 }

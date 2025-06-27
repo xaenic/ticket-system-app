@@ -60,11 +60,11 @@ class DashboardController extends Controller
 
      public function userData() {
 
-        $resolved = $this->ticketService->getTicketCountByStatus('resolved');
-        $inProgress = $this->ticketService->getTicketCountByStatus('in-progress');
-        $totalTickets = $this->ticketService->getTicketCounts();
-
-        $recents = $this->ticketService->getRecentTickets();
+        $role = auth()->user()->getRoleNames()->first();
+        $resolved = $this->ticketService->getTicketCountByStatus($role,'resolved');
+        $inProgress = $this->ticketService->getTicketCountByStatus($role,'in-progress');
+        $totalTickets = $this->ticketService->getTicketCounts($role);
+        $recents = $this->ticketService->getRecentTickets($role);
 
         return response()->json([
             'status' => 'success',
