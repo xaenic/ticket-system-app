@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $departmentCount = $this->departmentService->getDepartmentCounts();
         $openTicketsCount = $this->ticketService->getTicketCountByStatus('open');
         $closedTicketsCount = $this->ticketService->getTicketCountByStatus('closed');
-        $pendingTicketsCount = $this->ticketService->getTicketCountByStatus('pending');
+        $pendingTicketsCount = $this->ticketService->getTicketCountByStatus('in-progress');
         $totalTickets = $this->ticketService->getTicketCounts();
         $urgentTicketsCount = $this->ticketService->getTicketCountByPriority('High');
 

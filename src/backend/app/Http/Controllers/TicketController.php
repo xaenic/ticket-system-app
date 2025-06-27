@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Validations\TicketValidation as TicketRequest;
+use App\Validations\StatusValidation as StatusRequest;
 
 use Exception;
 
@@ -21,7 +22,7 @@ class TicketController extends Controller
         $this->ticketService = $ticketService;
 
         $this->middleware(['auth:api']);
-        $this->middleware(['role:admin'], ['except' => ['userTickets','assign','store','show','update']]);
+        $this->middleware(['role:admin'], ['except' => ['userTickets','assign','store','show','update','updateStatus']]);
     }
 
     public function index() {
@@ -115,6 +116,19 @@ class TicketController extends Controller
         $results = $this->ticketService->getAllTickets($role, $id, $page, $perPage, $query,$status,$priority);
 
         return response()->json($results , 200);
+    }
+
+    public function updateStatus(StatusRequest $request, $id) {
+
+        $data = $request->validated();
+
+        
+        $results = $this->ticketService->updateTicketStatus($data['status'],$id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ticket status updated successfully',
+        ], 200);
     }
     
 }

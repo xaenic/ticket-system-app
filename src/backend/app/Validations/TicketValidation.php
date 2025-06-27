@@ -15,7 +15,7 @@ class TicketValidation extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'status' => ['sometimes', 'in:pending,open,closed,duplicate'],
+            'status' => ['sometimes', 'in:in-progress,open,closed,resolved'],
             'priority' => ['required', 'in:low,medium,high'],
             'department_id' => ['required', 'exists:departments,id'],
             'deleted_files' => ['nullable', 'array'],

@@ -5,9 +5,11 @@ namespace App\Services;
 
 
 use App\Models\Ticket;
+use App\Models\User;
 
 use Exception;
 use App\Traits\HandleFileUploads;
+
 
 class TicketService {
 
@@ -56,8 +58,39 @@ class TicketService {
     }
 
     public function assignAgent(int $agent_id, int $ticket_id) {
-        $ticket = $this->ticket->find($id);
-        $ticket->department_id = $departmentId;
+        $ticket = $this->ticket->find($ticket_id);
+        if($ticket->assigned_user_id) {
+            throw new \Exception('Ticket is already assigned to an agent.');
+        }
+
+
+        $user = User::find($agent_id);
+
+        if($user->department_id != $ticket->department_id) {
+            throw new \Exception('Agent does not belong to the same department as the ticket.');
+        }
+
+
+        $ticket->status= 'in-progress';
+        $ticket->assigned_user_id = $agent_id;
+        return $ticket->save();
+    }
+
+    public function updateTicketStatus(string $status, int $ticket_id) {
+        $ticket = $this->ticket->find($ticket_id);
+        if(!$ticket) {
+            throw new \Exception('Ticket not found.');
+        }
+
+        $user_id = auth()->id();
+
+        if($user_id != $ticket->assigned_user_id) {
+            throw new \Exception('Only the assigned agent can update the ticket status.');
+        }
+        if($ticket-> status != 'in-progress' && $ticket->status != 'open') {
+            throw new \Exception('Only pending or open tickets can be updated.');
+        }
+        $ticket->status = $status;
         return $ticket->save();
     }
     
@@ -70,11 +103,14 @@ class TicketService {
         $query = Ticket::query();
         $query->with('responses')->with('responses.attachments')->with('responses.user');  
         $query->with('assigneduser');  
+        $query->with('department');  
         $query->with('attachments')->with('attachments.uploadedBy');  
-        if($user_id) $query->where(function ($q) use ($user_id) {
-            $q->where('client_id', $user_id)
-              ->orWhere('assigned_user_id', $user_id);
-            });
+
+        //anyone can view the ticket i guess
+        // if($user_id) $query->where(function ($q) use ($user_id) {
+        //     $q->where('client_id', $user_id)
+        //       ->orWhere('assigned_user_id', $user_id);
+        //     });
         return $query->where('id',$id)->first();
     }
 
@@ -92,7 +128,8 @@ class TicketService {
         
         if($role === 'client') $ticketQuery->where('client_id',$id);
 
-         return $ticketQuery->with('department')->paginate($perpage, ['*'], 'page', $page);
+         if($role === 'admin') $ticketQuery->with('assigneduser');
+         return $ticketQuery->with('client')->with('department')->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getRecentTickets(int $limit = 5) {

@@ -69,6 +69,9 @@ Route::prefix('tickets')
         Route::get('/{id}', [TicketController::class, 'show'])->where('id', '[0-9]+');
 
 
+        Route::patch('/status/{id}', [TicketController::class, 'updateStatus'])->where('id', '[0-9]+');
+
+
         Route::prefix('responses')
             ->group(function() {
                 Route::get('/{id}', [TicketResponseController::class, 'index']);
