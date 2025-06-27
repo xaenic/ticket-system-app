@@ -4,7 +4,7 @@ import { type IResponse } from "@/interfaces/IResponse";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import { columns } from "@/components/dashboard/client/ColumnsTicket";
+import { columns } from "@/components/dashboard/agent/ColumnsTicket";
 
 import { getUserTickets } from "@/services/ticket.service";
 import type { ITicket } from "@/interfaces/ITicket";
@@ -13,7 +13,7 @@ import { PlusIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { TableFilters } from "@/components/dashboard/client/TableFilters";
 
-const Ticket = () => {
+const AssignedTicket = () => {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState("10");
   const [status, setStatus] = useState("");
@@ -35,7 +35,7 @@ const Ticket = () => {
   };
 
   const handleUpdate = (id: string) => {
-    navigate(`/client/tickets/${id}`);
+    navigate(`/agent/tickets/${id}`);
   };
 
   return (
@@ -85,4 +85,4 @@ const Ticket = () => {
   );
 };
 
-export default Ticket;
+export default AssignedTicket;

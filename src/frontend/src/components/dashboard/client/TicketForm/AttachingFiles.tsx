@@ -5,10 +5,12 @@ import React from "react";
 export const AttachingFiles = ({
   setAttachedFiles,
   onChange,
+
   attachedFiles,
 }: {
   setAttachedFiles: React.Dispatch<React.SetStateAction<File[]>>;
   onChange: (files: File[]) => void;
+ 
   attachedFiles: File[];
 }) => {
   return (
@@ -24,6 +26,7 @@ export const AttachingFiles = ({
             const newFiles = Array.from(files);
             const updatedFiles = [...attachedFiles, ...newFiles];
             setAttachedFiles(updatedFiles);
+            
             onChange(updatedFiles);
           }
         }}

@@ -46,8 +46,8 @@ export const columns = ({ onEdit }: ColumnsProps): ColumnDef<ITicket>[] => [
     },
   },
   {
-    accessorKey: "department.name",
-    header: "Department",
+    accessorKey: "client.name",
+    header: "Client",
   },
   {
     accessorKey: "status",

@@ -4,11 +4,12 @@ import { Login } from "@/pages/auth/Login";
 import { Register } from "@/pages/auth/Register";
 import GuestRoute from "./protection/GuestRoutes";
 import { ProtectedRoute } from "./protection/ProtectedRoute";
-import { AdminRoutes, ClientRoutes } from "./PagesRoutes";
+import { AdminRoutes, AgentRoutes, ClientRoutes } from "./PagesRoutes";
 import { Suspense } from "react";
 import { PageLoader } from "@/components/ui/pageLoader";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { ClientLayout } from "@/layouts/ClientLayout";
+import { AgentLayout } from "@/layouts/AgentLayout";
 
 export default function AppRoutes() {
   return (
@@ -31,6 +32,14 @@ export default function AppRoutes() {
         <Route path="client" element={<ProtectedRoute role="client" />}>
           <Route element={<ClientLayout />}>
             {ClientRoutes.map((route, index) => {
+              const Page = route.component;
+              return <Route key={index} path={route.path} element={<Page />} />;
+            })}
+          </Route>
+        </Route>
+        <Route path="agent" element={<ProtectedRoute role="agent" />}>
+          <Route element={<AgentLayout />}>
+            {AgentRoutes.map((route, index) => {
               const Page = route.component;
               return <Route key={index} path={route.path} element={<Page />} />;
             })}

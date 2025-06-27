@@ -28,4 +28,27 @@ export const ClientRoutes = [
     path: "tickets/add",
     component: lazy(() => import("@/pages/client/AddTicket")),
   },
+  {
+    path: "tickets/:id",
+    component: lazy(() => import("@/pages/client/EditTicket")),
+  },
+];
+
+export const AgentRoutes = [
+  {
+    path: "dashboard",
+    component: lazy(() => import("@/pages/agent/Dashboard")),
+  },
+  {
+    path: "tickets",
+    component: lazy(() => import("@/pages/agent/OpenedTicket")),
+  },
+  {
+    path: "assigned",
+    component: lazy(() => import("@/pages/agent/AssignedTicket")),
+  },
+  {
+    path: "tickets/:id",
+    component: lazy(() => import("@/pages/agent/ViewTicket")),
+  },
 ];

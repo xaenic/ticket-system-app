@@ -9,3 +9,4 @@ export interface IResponse<T> {
     to: number;
     total: number;
 }
+

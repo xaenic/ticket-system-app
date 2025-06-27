@@ -3,26 +3,20 @@ import type { FileWithId } from "@/utils/formatfile";
 import { FileText, X } from "lucide-react";
 import React from "react";
 
-export const AttachedFiles = ({
-  onChange,
-  attachedFiles,
-  setAttachedFiles,
-  setDeletedFiles,
-  from = "View",
+export const NewAttachedFiles = ({
+  newFiles,
+  setNewFiles,
 }: {
-  onChange: (...event: [File[] | null]) => void;
-  attachedFiles: File[];
-  newFiles?: File[];
-  setAttachedFiles: React.Dispatch<React.SetStateAction<File[]>>;
-  setDeletedFiles?: React.Dispatch<React.SetStateAction<string[]>>;
+  newFiles: File[];
+  setNewFiles: React.Dispatch<React.SetStateAction<File[]>>;
   from?: string;
 }) => {
   return (
-    attachedFiles.length > 0 && (
+    newFiles.length > 0 && (
       <div className="space-y-2">
         {/* <h4 className="text-sm font-medium text-gray-700">Attached Files:</h4> */}
         <div className="space-y-2">
-          {attachedFiles.map((file: FileWithId, index: number) => (
+          {newFiles.map((file: FileWithId, index: number) => (
             <div
               key={index}
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
@@ -39,22 +33,18 @@ export const AttachedFiles = ({
                 </div>
               </div>
               <Button
-                disabled={from === "View"}
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  const updatedFiles = attachedFiles.filter(
+                  const updatedNewFiles = newFiles?.filter(
                     (_, i) => i !== index
                   );
-
-                  setAttachedFiles(updatedFiles);
-                  setDeletedFiles?.(prev => [...prev, file.id + ""]);
-                  onChange(updatedFiles.length > 0 ? updatedFiles : null);
+                  setNewFiles(updatedNewFiles);
                 }}
                 className="text-red-500 hover:text-red-700 hover:bg-red-50"
               >
-                {from !== "View" && <X className="w-4 h-4" />}
+                <X className="w-4 h-4" />
               </Button>
             </div>
           ))}

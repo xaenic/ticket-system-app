@@ -1,14 +1,11 @@
 import { DataTable } from "@/components/dashboard/data-table";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type IResponse } from "@/interfaces/IResponse";
-import { Dialog } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import { columns } from "@/components/dashboard/client/ColumnsTicket";
 
-import type { IUser } from "@/interfaces/IUser";
-import { DeleteAgent } from "@/components/dashboard/agent/DeleteAgent";
 import { getUserTickets } from "@/services/ticket.service";
 import type { ITicket } from "@/interfaces/ITicket";
 import { Button } from "@/components/ui/button";
@@ -22,9 +19,7 @@ const Ticket = () => {
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [agent, setAgent] = useState<IUser | null>(null);
 
   const debouncedQuery = useDebounce(query, 200);
 
@@ -39,16 +34,8 @@ const Ticket = () => {
     navigate("add");
   };
 
-  const handleUpdate = (ticket: ITicket) => {
-    console.log(ticket);
-  };
-
-  const handleDelete = (id: string) => {
-    setAgent({
-      id: id,
-      name: "",
-      email: "",
-    });
+  const handleUpdate = (id: string) => {
+    navigate(`/client/tickets/${id}`);
   };
 
   return (
@@ -69,33 +56,31 @@ const Ticket = () => {
           New Ticket
         </Button>
       </div>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DataTable<ITicket, ColumnDef<ITicket>>
-          onSearchChange={setQuery}
-          query={query}
-          columns={columns({ onDelete: handleDelete, onEdit: handleUpdate })}
-          isLoading={isLoading}
-          data={data?.data || []}
-          page={page}
-          total={data?.total || 0}
-          from={data?.from || 0}
-          to={data?.to || 0}
-          lastPage={data?.last_page || 1}
-          perPage={perPage}
-          onPageChange={setPage}
-          onPerPageChange={setPerPage}
-          tableTitle=""
-          SideButton={() =>
-            TableFilters({
-              status,
-              priority,
-              onStatusChange: setStatus,
-              onPriorityChange: setPriority,
-            })
-          }
-        />
-        <DeleteAgent setIsOpen={setIsOpen} user={agent} />
-      </Dialog>
+
+      <DataTable<ITicket, ColumnDef<ITicket>>
+        onSearchChange={setQuery}
+        query={query}
+        columns={columns({ onEdit: handleUpdate })}
+        isLoading={isLoading}
+        data={data?.data || []}
+        page={page}
+        total={data?.total || 0}
+        from={data?.from || 0}
+        to={data?.to || 0}
+        lastPage={data?.last_page || 1}
+        perPage={perPage}
+        onPageChange={setPage}
+        onPerPageChange={setPerPage}
+        tableTitle=""
+        SideButton={() =>
+          TableFilters({
+            status,
+            priority,
+            onStatusChange: setStatus,
+            onPriorityChange: setPriority,
+          })
+        }
+      />
     </main>
   );
 };
