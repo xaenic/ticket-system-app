@@ -70,7 +70,7 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2">
         <TicketStatus stats={data?.stats} />
-        <RecentActivity />
+        <RecentActivity recents={data?.recents || []} subtitle="Latest updates from client tickets"/>
       </div>
     </main>
   );

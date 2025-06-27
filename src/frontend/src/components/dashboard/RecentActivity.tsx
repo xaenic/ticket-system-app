@@ -9,7 +9,6 @@ import {
 import { Separator } from "../ui/separator";
 import { Calendar } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { statusColorCodes } from "./admin/ColumnsTicket";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";

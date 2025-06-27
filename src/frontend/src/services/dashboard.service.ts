@@ -17,7 +17,7 @@ export const getDashboardData = async () => {
 export const getAgentDashboard = async () => {
 
 
-    const response = await api.get('/dashboard/agent');
+    const response = await api.get('/dashboard/data');
     if(response.status !== 200) {
         throw new Error('Failed to fetch dashboard data');
     }

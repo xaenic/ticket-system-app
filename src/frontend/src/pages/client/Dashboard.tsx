@@ -1,18 +1,37 @@
 import { useAuth } from "@/hooks/useAuth";
 
-import { Ticket, Calendar, Building2, User, Users2 } from "lucide-react";
+import {
+  Ticket,
+  Calendar,
+  Tag,
+  TrendingUp,
+  CircleCheckBig,
+} from "lucide-react";
 import { Widget } from "@/components/dashboard/Widget";
-import { TicketStatus } from "@/components/dashboard/TicketStatus";
-import RecentActivity from "@/components/dashboard/RecentActivity";
 import { useQuery } from "@tanstack/react-query";
-import { getDashboardData } from "@/services/dashboard.service";
+import { getAgentDashboard } from "@/services/dashboard.service";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  priorityColorCodes,
+  statusColorCodes,
+} from "@/components/dashboard/admin/ColumnsTicket";
+import type { ITicket } from "@/interfaces/ITicket";
 
 const Dashboard = () => {
   const { user } = useAuth();
 
   const { data } = useQuery({
     queryKey: ["dashboard"],
-    queryFn: getDashboardData,
+    queryFn: getAgentDashboard,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
   const stats = [
@@ -20,25 +39,19 @@ const Dashboard = () => {
       icon: <Ticket className="h-6 w-6 text-blue-600" />,
       subText: "Total Tickets",
       title: "Tickets",
-      count: data?.stats?.totalTicketsCount || 0,
+      count: data?.stats?.totalTickets || 0,
     },
     {
-      icon: <Building2 className="h-6 w-6 text-orange-600" />,
-      subText: "Number of Departments",
-      title: "Departments",
-      count: data?.stats?.departmentCount || 0,
+      icon: <TrendingUp className="h-6 w-6 text-orange-600" />,
+      subText: "Number of In-Progress Tickets",
+      title: "In-Progress",
+      count: data?.stats?.inProgress || 0,
     },
     {
-      icon: <User className="h-6 w-6 text-purple-600" />,
-      subText: "Active Clients",
-      title: "Clients",
-      count: data?.stats?.clientsCount || 0,
-    },
-    {
-      icon: <Users2 className="h-6 w-6 text-yellow-600" />,
-      subText: "Active Agents",
-      title: "Agents",
-      count: data?.stats?.agentsCount || 0,
+      icon: <CircleCheckBig className="h-6 w-6 text-green-600" />,
+      subText: "Number of resolved tickets",
+      title: "Resolved",
+      count: data?.stats?.resolved || 0,
     },
   ];
   return (
@@ -69,7 +82,73 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <RecentActivity />
+        <Card className="shadow-none border-none">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
+            <Tag className="w-4 h-4 " />
+            <CardTitle className="text-sm font-medium">
+              Your Recent Tickets
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-slate-700 uppercase text-xs">
+                      SUBJECT
+                    </TableHead>
+                    <TableHead className="text-slate-700 uppercase text-xs">
+                      Priority
+                    </TableHead>
+                    <TableHead className="text-slate-700 uppercase text-xs">
+                      Status
+                    </TableHead>
+
+                    <TableHead className="text-slate-700 uppercase text-xs">
+                      Assigned
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {data?.recents?.map((ticket: ITicket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell>
+                        <span className="text-xs font-medium text-slate-600">
+                          TKT-{ticket.id} {ticket.title.slice(0, 10)}...
+                        </span>{" "}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`${
+                            priorityColorCodes[
+                              ticket.priority as keyof typeof priorityColorCodes
+                            ]
+                          }`}
+                        >
+                          {ticket?.priority?.toUpperCase()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`${
+                            statusColorCodes[
+                              ticket.status as keyof typeof statusColorCodes
+                            ]
+                          }`}
+                        >
+                          {ticket?.status?.toUpperCase()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{ticket?.assigneduser?.name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

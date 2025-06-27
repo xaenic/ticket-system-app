@@ -29,7 +29,7 @@ class DashboardController extends Controller
 
         $departmentCount = $this->departmentService->getDepartmentCounts();
         $openTicketsCount = $this->ticketService->getTicketCountByStatus('open');
-        $closedTicketsCount = $this->ticketService->getTicketCountByStatus('closed');
+        $closedTicketsCount = $this->ticketService->getTicketCountByStatus('resolved');
         $pendingTicketsCount = $this->ticketService->getTicketCountByStatus('in-progress');
         $totalTickets = $this->ticketService->getTicketCounts();
         $urgentTicketsCount = $this->ticketService->getTicketCountByPriority('High');
@@ -58,7 +58,7 @@ class DashboardController extends Controller
         ], 200);
     }
 
-     public function agent() {
+     public function userData() {
 
         $resolved = $this->ticketService->getTicketCountByStatus('resolved');
         $inProgress = $this->ticketService->getTicketCountByStatus('in-progress');

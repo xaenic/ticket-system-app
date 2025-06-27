@@ -139,9 +139,9 @@ class TicketService {
         $role = auth()->user()->getRoleNames()->first();
 
         if($role == "admin") {
-            return $this->ticket->orderBy('created_at', 'desc')->take($limit)->get();
+            return $this->ticket->with('client')->orderBy('created_at', 'desc')->take($limit)->get();
         }
-        return $this->ticket->with('client')->where('client_id', $id)->orWhere('assigned_user_id',$id)->orderBy('updated_at', 'desc')->take($limit)->get();
+        return $this->ticket->with('assigneduser')->with('client')->where('client_id', $id)->orWhere('assigned_user_id',$id)->orderBy('updated_at', 'desc')->take($limit)->get();
     }
 
     public function getTicketCounts() {
@@ -159,7 +159,10 @@ class TicketService {
             return $this->ticket->where('status', $status)->count();
 
         $id = auth()->id(); 
-        return $this->ticket->where('assigned_user_id',$id)->count();
+        
+        return $this->ticket->where('status',$status)->where(function ($q) use ($id) {
+            $q->where('assigned_user_id',$id)->orWhere('client_id',$id);
+        })->count();
     }
 
     public function getTicketCountByPriority(string $priority) {

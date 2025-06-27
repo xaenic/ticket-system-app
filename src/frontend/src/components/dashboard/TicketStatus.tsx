@@ -23,14 +23,7 @@ export const TicketStatus = ({ stats }: { stats: IStat }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">Open</span>
-            </div>
-            <span className="text-sm font-semibold">{stats?.openTicketsCount}</span>
-          </div>
-
+       
           <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>

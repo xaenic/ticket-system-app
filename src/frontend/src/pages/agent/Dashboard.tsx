@@ -1,8 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 
-import { Ticket, Calendar, Building2, User, Users2, CircleCheckBig, TrendingUp } from "lucide-react";
+import { Ticket, Calendar, CircleCheckBig, TrendingUp } from "lucide-react";
 import { Widget } from "@/components/dashboard/Widget";
-import { TicketStatus } from "@/components/dashboard/TicketStatus";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import { useQuery } from "@tanstack/react-query";
 import { getAgentDashboard } from "@/services/dashboard.service";
