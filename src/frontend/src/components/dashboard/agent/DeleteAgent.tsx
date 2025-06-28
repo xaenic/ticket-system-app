@@ -33,9 +33,11 @@ export function DeleteAgent({
       });
       toast.success(resp);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to delete department"
-      );
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
     }
     setLoading(false);
     setIsOpen(false);

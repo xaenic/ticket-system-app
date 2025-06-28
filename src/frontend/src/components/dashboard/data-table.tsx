@@ -29,7 +29,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   page: number;
   total: number;
-  perPage: string;
+  perPage: number;
   lastPage: number;
   from: number;
   to: number;
@@ -37,7 +37,7 @@ interface DataTableProps<TData, TValue> {
   query: string;
   tableTitle: string;
   onPageChange: (page: number) => void;
-  onPerPageChange: (value: string) => void;
+  onPerPageChange: (value: number) => void;
   onSearchChange: (value: string) => void;
   onAddClick?: () => void;
   SideButton?: React.FC;
@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
     state: {
       pagination: {
         pageIndex: 0, // React Table uses 0-based indexing
-        pageSize: parseInt(perPage),
+        pageSize:perPage,
       },
     },
     pageCount: lastPage,

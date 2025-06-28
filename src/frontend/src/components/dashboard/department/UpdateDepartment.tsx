@@ -35,9 +35,12 @@ export function UpdateDepartment({
       });
       toast.success(resp);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update department"
-      );
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else if (error instanceof Object) {
+            toast.error(String((error as { name?: string }).name));
+        }else
+      toast.error("Something went wrong");
     }
     setLoading(false);
     setIsOpen(false);

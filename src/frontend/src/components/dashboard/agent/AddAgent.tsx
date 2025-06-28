@@ -46,26 +46,14 @@ export function AddAgent({
     const { name, email, password, confirmPassword, department_id } = values;
 
     try {
-      const data = await addAgent(
+      await addAgent(
         name,
         email,
         password,
         confirmPassword,
         department_id + ""
       );
-
-      if (data instanceof Object) {
-        Object.entries(data).forEach(
-          ([field, msgArray]: [string, string[]]) => {
-            form.setError(field as keyof z.infer<typeof agentSchema>, {
-              type: "server",
-              message: msgArray.join(", "),
-            });
-          }
-        );
-        setLoading(false);
-        return;
-      }
+    
       setIsOpen(false);
       queryClient.invalidateQueries({
         queryKey: ["agents"], //
@@ -74,10 +62,20 @@ export function AddAgent({
 
       form.reset();
       toast.success("Successfully added agent");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to add agent"
-      );
+    }catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else if (error instanceof Object) {
+        Object.entries(error).forEach(
+          ([field, msgArray]: [string, string[]]) => {
+            form.setError(field as keyof z.infer<typeof agentSchema>, {
+              type: "server",
+              message: Array.isArray(msgArray) ? msgArray.join(", ") : msgArray,
+            });
+          }
+        );
+      }else
+      toast.error("Something went wrong");
     }
 
     setLoading(false);

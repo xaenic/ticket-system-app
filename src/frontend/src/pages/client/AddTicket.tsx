@@ -55,10 +55,21 @@ const AddTicket = () => {
       await addTicket({ ...values });
 
       navigate("/client/tickets");
+      toast.success("Ticket created successfully!");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create ticket"
-      );
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else if (error instanceof Object) {
+        Object.entries(error).forEach(
+          ([field, msgArray]: [string, string[]]) => {
+            form.setError(field as keyof z.infer<typeof TicketSchema>, {
+              type: "server",
+              message: Array.isArray(msgArray) ? msgArray.join(", ") : msgArray,
+            });
+          }
+        );
+      }else
+      toast.error("Something went wrong");
     }
     setLoading(false);
   };

@@ -18,7 +18,7 @@ import { TicketSchema } from "@/utils/formSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { AttachedFiles } from "@/components/dashboard/client/TicketForm/AttachedFiles";
@@ -34,7 +34,6 @@ import TicketView from "@/components/dashboard/client/TicketView";
 import { NewAttachedFiles } from "@/components/dashboard/client/TicketForm/NewAttachedFiles";
 
 const EditTicket = () => {
-  const navigate = useNavigate();
 
   const { id } = useParams();
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -59,23 +58,14 @@ const EditTicket = () => {
   const handleCreate = async (values: z.infer<typeof TicketSchema>) => {
     setLoading(true);
     try {
-      const ok = await updateTicket({
+      await updateTicket({
         ...values,
         attachments: newFiles,
         deleted_files: deletedFiles,
         id: id || "",
       });
 
-      if (ok instanceof Object) {
-        Object.entries(ok).forEach(([field, msgArray]: [string, string[]]) => {
-          form.setError(field as keyof z.infer<typeof TicketSchema>, {
-            type: "server",
-            message: msgArray.join(", "),
-          });
-        });
-        setLoading(false);
-        return;
-      }
+      
       queryClient.invalidateQueries({
         queryKey: ["ticket", id], // base key — matches any related queries
         exact: false,
@@ -85,9 +75,20 @@ const EditTicket = () => {
       setAttachedFiles([]);
       setIsEditMode(false);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create ticket"
-      );
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else if (error instanceof Object) {
+        Object.entries(error).forEach(
+          ([field, msgArray]: [string, string[]]) => {
+            form.setError(field as keyof z.infer<typeof TicketSchema>, {
+              type: "server",
+              message: Array.isArray(msgArray) ? msgArray.join(", ") : msgArray,
+            });
+          }
+        );
+      }else
+      toast.error("Something went wrong");
+    
     }
     setLoading(false);
   };

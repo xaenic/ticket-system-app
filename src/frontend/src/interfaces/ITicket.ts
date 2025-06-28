@@ -92,3 +92,30 @@ export interface IUpdateTicket {
   department_id?: number;
   assigned_user_id?: number | null;
 }
+
+export type PaginationParams = {
+  page?: number;
+  perPage: number;
+  query?: string;
+};
+
+// Type for user tickets with additional filters
+export type UserTicketsParams = PaginationParams & {
+  status?: string;
+  priority?: string;
+};
+
+// Type for common ticket form data
+export type TicketFormData = {
+  title: string;
+  description: string;
+  priority: TicketPriority;
+  attachments?: File[];
+  department_id: string;
+};
+
+// Type for update ticket form data (extends base with additional fields)
+export type UpdateTicketFormData = TicketFormData & {
+  id: string;
+  deleted_files: string[];
+};

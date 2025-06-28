@@ -1,43 +1,75 @@
 import type { IResponse } from "@/interfaces/IResponse";
-import type { ITicket, TicketPriority } from "@/interfaces/ITicket";
+import type { ITicket, PaginationParams, TicketFormData, UpdateTicketFormData, UserTicketsParams } from "@/interfaces/ITicket";
 import type { AgentFields } from "@/interfaces/IUser";
 import api from "@/utils/api";
 import { AxiosError } from "axios";
 
-export const getUserTickets = async (
-  page: number = 1,
-  perPage: string,
-  query: string = "",
-  status: string = "",
-  priority: string = ""
-): Promise<IResponse<ITicket>> => {
-  const response = await api.get(
-    `/tickets?query=${query}&status=${status.replace(
-      "all",
-      ""
-    )}&priority=${priority.replace("all", "")}&page=${page}&per_page=${perPage}`
-  );
+// Type for common pagination and query parameters
 
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch tickets");
+export const getUserTickets = async ({
+  page = 1,
+  perPage=10,
+  query = "",
+  status = "",
+  priority = ""
+}: UserTicketsParams): Promise<IResponse<ITicket>> => {
+  
+  try {
+      const response = await api.get(
+      `/tickets?query=${query}&status=${status.replace(
+        "all",
+        ""
+      )}&priority=${priority.replace("all", "")}&page=${page}&per_page=${perPage}`
+    );
+
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch tickets");
+      }
+
+      return response.data;
+  }catch (error) {
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
+    }
+
+    throw new Error("Something went wrong during fetching tickets");
   }
-
-  return response.data;
+  
 };
-export const getOpenTickets = async (
-  page: number = 1,
-  perPage: string,
-  query: string = ""
-): Promise<IResponse<ITicket>> => {
-  const response = await api.get(
+export const getOpenTickets = async ({
+  page = 1,
+  perPage,
+  query = ""
+}: PaginationParams): Promise<IResponse<ITicket>> => {
+
+  try {
+    const response = await api.get(
     `/tickets/open?query=${query}&page=${page}&per_page=${perPage}`
-  );
+    );
 
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch tickets");
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch tickets");
+    }
+
+    return response.data;
+  }catch (error) {
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
+    }
+
+    throw new Error("Something went wrong during fetching tickets");
   }
-
-  return response.data;
+  
 };
 
 export const addTicket = async ({
@@ -46,13 +78,7 @@ export const addTicket = async ({
   priority,
   attachments,
   department_id,
-}: {
-  title: string;
-  description: string;
-  priority: TicketPriority;
-  attachments?: File[];
-  department_id: string;
-}): Promise<AgentFields | boolean> => {
+}: TicketFormData): Promise<AgentFields | boolean> => {
   try {
     const response = await api.post(
       "/tickets",
@@ -74,11 +100,16 @@ export const addTicket = async ({
 
     return true;
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 422) {
-      const msg = error.response.data.messages;
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to add ticket");
+  
+    throw new Error("Something went wrong during adding ticket");
   }
 };
 export const getTicket = async (id: string): Promise<IResponse<ITicket>> => {
@@ -95,15 +126,7 @@ export const updateTicket = async ({
   attachments,
   department_id,
   deleted_files,
-}: {
-  id: string;
-  title: string;
-  description: string;
-  deleted_files: string[];
-  priority: TicketPriority;
-  attachments?: File[];
-  department_id: string;
-}): Promise<ITicket | boolean> => {
+}: UpdateTicketFormData): Promise<ITicket | boolean> => {
   try {
     const response = await api.post(
       `/tickets/${id}`,
@@ -126,17 +149,16 @@ export const updateTicket = async ({
 
     return true;
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
-      const msg = error.response.data.messages;
-      const exception = error.response.data.message;
-
-      if (exception) throw new Error(exception);
-      //execption error from backend
-
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-
-    throw new Error("Failed to update ticket");
+  
+    throw new Error("Something went wrong during updating ticket");
   }
 };
 
@@ -148,14 +170,16 @@ export const assignTicket = async (id: string) => {
       throw new Error("Failed to assign ticket");
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
-      const msg = error.response.data.messages;
-      const exception = error.response.data.message;
-
-      if (exception) throw new Error(exception);
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to assign ticket");
+
+    throw new Error("Something went wrong during assigning ticket");
   }
 
   return "Successfully assigned ticket";
@@ -172,14 +196,16 @@ export const updateTicketStatus = async (status: string, id: string) => {
       throw new Error("Failed to update ticket status");
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
-      const msg = error.response.data.messages;
-      const exception = error.response.data.message;
-
-      if (exception) throw new Error(exception);
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to update ticket status");
+
+    throw new Error("Something went wrong during updating ticket status");
   }
 
   return "Successfully updated ticket status";

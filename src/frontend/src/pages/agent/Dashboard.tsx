@@ -8,7 +8,6 @@ import { getAgentDashboard } from "@/services/dashboard.service";
 
 const Dashboard = () => {
   const { user } = useAuth();
-
   const { data } = useQuery({
     queryKey: ["dashboard"],
     queryFn: getAgentDashboard,

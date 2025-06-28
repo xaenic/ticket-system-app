@@ -15,7 +15,7 @@ import { TableFilters } from "@/components/dashboard/client/TableFilters";
 
 const AssignedTicket = () => {
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState("10");
+  const [perPage, setPerPage] = useState(10);
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [query, setQuery] = useState("");
@@ -26,7 +26,7 @@ const AssignedTicket = () => {
   const { data, isLoading } = useQuery<IResponse<ITicket>, Error>({
     queryKey: ["agents", page, perPage, debouncedQuery, status, priority],
     queryFn: () =>
-      getUserTickets(page, perPage, debouncedQuery, status, priority),
+      getUserTickets({page, perPage, query:debouncedQuery, status, priority}),
     staleTime: 5000,
   });
 

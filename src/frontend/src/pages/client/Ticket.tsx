@@ -15,7 +15,7 @@ import { TableFilters } from "@/components/dashboard/client/TableFilters";
 
 const Ticket = () => {
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState("10");
+  const [perPage, setPerPage] = useState(10);
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [query, setQuery] = useState("");
@@ -26,7 +26,7 @@ const Ticket = () => {
   const { data, isLoading } = useQuery<IResponse<ITicket>, Error>({
     queryKey: ["agents", page, perPage, debouncedQuery, status, priority],
     queryFn: () =>
-      getUserTickets(page, perPage, debouncedQuery, status, priority),
+      getUserTickets({page, perPage, query:debouncedQuery, status, priority}),
     staleTime: 5000,
   });
 
@@ -38,6 +38,7 @@ const Ticket = () => {
     navigate(`/client/tickets/${id}`);
   };
 
+  
   return (
     <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">

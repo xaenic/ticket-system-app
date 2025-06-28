@@ -28,13 +28,13 @@ class DashboardController extends Controller
     public function index() {
 
         $departmentCount = $this->departmentService->getDepartmentCounts();
-        $openTicketsCount = $this->ticketService->getTicketCountByStatus('open');
-        $closedTicketsCount = $this->ticketService->getTicketCountByStatus('resolved');
-        $pendingTicketsCount = $this->ticketService->getTicketCountByStatus('in-progress');
-        $totalTickets = $this->ticketService->getTicketCounts();
-        $urgentTicketsCount = $this->ticketService->getTicketCountByPriority('High');
+        $openTicketsCount = $this->ticketService->getTicketCountByStatus('admin','open');
+        $closedTicketsCount = $this->ticketService->getTicketCountByStatus('admin','resolved');
+        $pendingTicketsCount = $this->ticketService->getTicketCountByStatus('admin','in-progress');
+        $totalTickets = $this->ticketService->getTicketCounts('admin');
+        $urgentTicketsCount = $this->ticketService->getTicketCountByPriority('admin','High');
 
-        $recents = $this->ticketService->getRecentTickets();
+        $recents = $this->ticketService->getRecentTickets('admin');
 
 
         $agentsCount = $this->userService->getUserCountsByRole("agent");

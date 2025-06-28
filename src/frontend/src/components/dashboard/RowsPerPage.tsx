@@ -13,7 +13,7 @@ export function RowsPerPage({
   onValueChange,
 }: {
   onValueChange: (value: string ) => void;
-  rowsPerpage: string;
+  rowsPerpage: number;
 }) {
   return (
     <Select defaultValue="10" onValueChange={onValueChange}>

@@ -41,11 +41,15 @@ export const addAgent = async (
 
     return true;
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 422) {
-      const msg = error.response.data.messages;
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to add agent");
+    throw new Error("Something went wrong when adding agent");
   }
 };
 
@@ -61,11 +65,15 @@ export const updateAgent = async (
       throw new Error("Failed to update department");
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 422) {
-      const msg = error.response.data.messages;
-      return msg;
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to update agent");
+    throw new Error("Something went wrong when updating agent");
   }
 
   return true;
@@ -79,11 +87,15 @@ export const deleteAgent = async (id: string) => {
       throw new Error("Failed to delete agent");
     }
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 422) {
-      const msg = error.response.data.messages["name"];
-      throw new Error(msg);
+    if (error instanceof AxiosError && error.response?.data) {
+      // Handle validation errors from backend
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
     }
-    throw new Error("Failed to delete agent");
+    throw new Error("Something went wrong when deleting agent");
   }
 
   return "Successfully deleted agent";

@@ -1,10 +1,10 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
 import {
-  assignTicket,
+
   getTicket,
   updateTicketStatus,
 } from "@/services/ticket.service";
@@ -18,7 +18,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { IResponse } from "@/interfaces/IResponse";
 
 const ViewTicket = () => {
-  const navigate = useNavigate();
 
   const { id } = useParams();
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -75,6 +74,7 @@ const ViewTicket = () => {
       setAttachedFiles(files || []);
     }
   }, [data]);
+
   return isError ? (
     <p>Not found </p>
   ) : isLoading ? (

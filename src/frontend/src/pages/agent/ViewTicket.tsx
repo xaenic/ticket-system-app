@@ -1,59 +1,50 @@
-import type { IDepartment } from "@/interfaces/IDepartment";
 import type { IResponse } from "@/interfaces/IResponse";
-import { getDepartments } from "@/services/department.service";
-import { TicketSchema } from "@/utils/formSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import type { z } from "zod";
+
 
 import { Button } from "@/components/ui/button";
 
 import {
   assignTicket,
   getTicket,
-  updateTicket,
+
   updateTicketStatus,
 } from "@/services/ticket.service";
 import toast from "react-hot-toast";
-import { Cross, Loader2, Lock, MoveDown, X } from "lucide-react";
+import { Loader2, Lock, MoveDown, X } from "lucide-react";
 import type { Attachment, ITicket } from "@/interfaces/ITicket";
 import { attachmentToFile } from "@/utils/formatfile";
 import TicketView from "@/components/dashboard/client/TicketView";
 import { useAuth } from "@/hooks/useAuth";
 
 const ViewTicket = () => {
-  const navigate = useNavigate();
-
+  const { user } = useAuth();
   const { id } = useParams();
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { data, isError, isLoading } = useQuery<IResponse<ITicket>, Error>({
-    queryKey: ["ticket", id],
+    queryKey: ["ticket", id, 'view'],
     queryFn: () => getTicket(id || ""),
     staleTime: 5000,
-    retry: false,
   });
   const queryClient = useQueryClient();
 
-  const { user } = useAuth();
+  
   const handleAssignment = async () => {
     setLoading(true);
     try {
       await assignTicket(id || "");
-
-      queryClient.invalidateQueries({
-        queryKey: ["ticket", id],
-        exact: false,
-      });
+      await queryClient.refetchQueries({ queryKey: ["ticket", id] });
       toast.success("Successfully updated ticket");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create ticket"
-      );
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }else
+      toast.error("Something went wrong");
     }
     setLoading(false);
   };
@@ -99,6 +90,8 @@ const ViewTicket = () => {
       setAttachedFiles(files || []);
     }
   }, [data]);
+
+
   return isError ? (
     <p>Not found </p>
   ) : isLoading ? (
@@ -148,7 +141,7 @@ const ViewTicket = () => {
               variant="default"
             >
               {isAssigned ? "Assigned" : "Assign to me"}
-
+            
               {loading && <Loader2 className="animate-spin w-4 h-4" />}
             </Button>
           </div>

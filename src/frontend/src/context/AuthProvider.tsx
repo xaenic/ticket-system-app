@@ -5,7 +5,7 @@ import {
   checkStatus,
   clearAuthState,
   loginService,
-
+  registerService,
   storeAuthState,
 } from "@/services/auth.service";
 import type { IUser } from "@/interfaces/IUser";
@@ -44,10 +44,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     const { user, token } = await loginService(email, password);
     setUser(user);
+    
     setIsAuthenticated(true);
     if (token) storeAuthState(token);
 
     <Navigate to={'/dashboard'} />
+  };
+
+  const register = async (name: string, email: string, password: string, confirmPassword: string) => {
+    const { user, token } = await registerService(name, email, password, confirmPassword);
+    setUser(user);
+    setIsAuthenticated(true);
+    if (token) storeAuthState(token);
   };
 
   const logout = async () => {
@@ -72,6 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         isAuthenticated,
         login,
+        register,
         logout,
       }}
     >
