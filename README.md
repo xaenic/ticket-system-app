@@ -54,6 +54,18 @@ docker-compose up -d
 - **Backend API (Laravel)**: http://localhost:8000
 - **Database**: localhost:3306
 
+### 5. Default Login Credentials
+
+The application comes with pre-configured user accounts for testing:
+
+**Admin Account:**
+- Email: `admin@example.com`
+- Password: `password`
+
+**Client Account:**
+- Email: `client@example.com`
+- Password: `password`
+
 ## 🐳 Docker Services
 
 The application consists of three main services:
