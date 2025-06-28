@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full rounded-md border-none bg-white ">
-      <div className="flex p-4 justify-between items-center">
+      <div className="flex p-4 justify-between items-center gap-3 flex-wrap">
         <div>
           <Input
             value={query}
@@ -85,9 +85,9 @@ export function DataTable<TData, TValue>({
             placeholder="Search..."
           />
         </div>
-        <div>
+        <div className="self-end shrink-1">
           {tableTitle != "" && (
-            <DialogTrigger asChild>
+            <DialogTrigger asChild >
               <Button size={"sm"} onClick={onAddClick} variant={"default"}>
                 <PlusIcon />
                 New {tableTitle}

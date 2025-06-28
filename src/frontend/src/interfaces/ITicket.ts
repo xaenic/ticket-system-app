@@ -1,3 +1,4 @@
+import type { FileWithId } from "@/utils/formatfile";
 import type { IDepartment } from "./IDepartment";
 import type { IUser } from "./IUser";
 
@@ -29,7 +30,7 @@ export type TicketResponse = {
   attachments?: Attachment[];
 }
 
-export type Attachment = {
+export interface Attachment extends FileWithId{
   id: number;
   filename: string;
   file_path: string;

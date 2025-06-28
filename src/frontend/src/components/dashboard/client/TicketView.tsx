@@ -7,11 +7,16 @@ import { Separator } from "@/components/ui/separator";
 import { formatDateInWords } from "@/utils/formatDate";
 import { ResponseMessages } from "../ResponseMessages";
 import { ResponseInput } from "../ResponseInput";
+import type { FileWithId } from "@/utils/formatfile";
+import { getPriorityColor, getStatusColor } from "@/utils/colors";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BASE_API_URL } from "@/utils/api";
+import { getInitials } from "@/utils/helpers";
 
 interface TicketViewProps {
   ticket: ITicket;
   attachedFiles: File[];
-  setAttachedFiles: Dispatch<SetStateAction<File[]>>;
+  setAttachedFiles: Dispatch<SetStateAction<FileWithId[] | File[]>>;
 }
 
 const TicketView = ({
@@ -19,19 +24,6 @@ const TicketView = ({
   attachedFiles,
   setAttachedFiles,
 }: TicketViewProps) => {
-  const priorityColorCodes = {
-    low: "bg-gray-100 text-gray-700 border border-gray-200",
-    medium: "bg-yellow-100 text-yellow-700 border border-yellow-200",
-    high: "bg-red-100 text-red-700 border border-red-200",
-  };
-
-  const statusColorCodes = {
-    pending: "bg-orange-100 text-orange-700 border border-orange-200",
-    closed: "bg-green-100 text-green-700 border border-green-200",
-    open: "bg-blue-100 text-blue-700 border border-blue-200",
-    duplicate: "bg-red-100 text-red-700 border border-red-200",
-  };
-
   return (
     <Card className="border-none shadow-none p-4">
       <div className=" gap-2 flex  items-center  justify-between">
@@ -42,18 +34,17 @@ const TicketView = ({
         <div className="gap-2 flex items-center">
           <div className="">
             <span
-              className={`${
-                priorityColorCodes[ticket.priority || "low"]
-              } px-3 py-1  uppercase rounded-md font-semibold text-xs h-full`}
+              className={`${getPriorityColor(
+                ticket.priority || "low"
+              )} px-3 py-1  uppercase rounded-md font-semibold text-xs h-full`}
             >
               {ticket.priority}
             </span>
           </div>
           <span
             className={`${
-              statusColorCodes[
-                ticket.status as keyof typeof statusColorCodes
-              ] || "bg-gray-100 text-gray-700 border border-gray-200"
+              getStatusColor(ticket.status) ||
+              "bg-gray-100 text-gray-700 border border-gray-200"
             } px-3 py-1 uppercase rounded-md font-semibold text-xs`}
           >
             {ticket.status}
@@ -62,7 +53,7 @@ const TicketView = ({
       </div>
       <div className="flex flex-col gap-4">
         <Separator />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-5">
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-700">Ticket ID</label>
             <div className="">
@@ -85,12 +76,52 @@ const TicketView = ({
               </p>
             </div>
           </div>
+           <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-700">Ticket Owner</label>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage
+                  src={
+                    BASE_API_URL?.replace("/api", "/storage/") +
+                    ticket.client?.avatar
+                  }
+                  alt={ticket?.client?.name}
+                />
+                <AvatarFallback className="bg-blue-500 text-white text-xs">
+                  {getInitials(ticket?.client?.name || "")}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-base text-xs font-medium">
+                  {ticket.client?.name || "Unassigned"}
+                </p>
+               
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-700">Assigned Agent</label>
-            <div className="">
-              <p className="text-base text-xs font-medium">
-                {ticket.assigneduser?.name || "Unassigned"}
-              </p>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage
+                  src={
+                    BASE_API_URL?.replace("/api", "/storage/") +
+                    ticket?.assigneduser?.avatar
+                  }
+                  alt={ticket?.assigneduser?.name}
+                />
+                <AvatarFallback className="bg-blue-500 text-white text-xs">
+                  {getInitials(ticket?.assigneduser?.name || "")}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-base text-xs font-medium">
+                  {ticket.assigneduser?.name || "Unassigned"}
+                </p>
+                <p className="text-base text-xs text-slate-500">
+                  {ticket.assigneduser?.email || "Unassigned"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -136,7 +167,9 @@ const TicketView = ({
             </div>
             <ResponseMessages responses={ticket.responses || []} />
 
-            {(ticket.status !== "closed" && ticket.status !== "resolved") && <ResponseInput />}
+            {ticket.status !== "closed" && ticket.status !== "resolved" && (
+              <ResponseInput />
+            )}
           </div>
         )}
       </div>

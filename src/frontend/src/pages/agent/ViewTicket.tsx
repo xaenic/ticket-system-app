@@ -16,14 +16,16 @@ import {
 import toast from "react-hot-toast";
 import { Loader2, Lock, MoveDown, X } from "lucide-react";
 import type { Attachment, ITicket } from "@/interfaces/ITicket";
-import { attachmentToFile } from "@/utils/formatfile";
+import { attachmentToFile, type FileWithId } from "@/utils/formatfile";
 import TicketView from "@/components/dashboard/client/TicketView";
 import { useAuth } from "@/hooks/useAuth";
+import ViewTicketSkeleton from "@/components/ViewTicketSkeleton";
+import NotFound from "@/components/NotFound";
 
 const ViewTicket = () => {
   const { user } = useAuth();
   const { id } = useParams();
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<FileWithId[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { data, isError, isLoading } = useQuery<IResponse<ITicket>, Error>({
@@ -93,11 +95,11 @@ const ViewTicket = () => {
 
 
   return isError ? (
-    <p>Not found </p>
+    <NotFound/>
   ) : isLoading ? (
-    <p>Loading</p>
+    <ViewTicketSkeleton/>
   ) : (
-    <main className="p-8 space-y-4 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="p-4 md:p-8 space-y-4 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -168,7 +170,7 @@ const ViewTicket = () => {
         <TicketView
           ticket={data.data[0]}
           attachedFiles={attachedFiles}
-          setAttachedFiles={setAttachedFiles}
+          setAttachedFiles={setAttachedFiles as React.Dispatch<React.SetStateAction<File[]>>}
         />
       )}
       <div className="#bottom"></div>

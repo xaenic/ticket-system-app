@@ -8,8 +8,7 @@ import { columns } from "@/components/dashboard/agent/ColumnsTicket";
 
 import { getUserTickets } from "@/services/ticket.service";
 import type { ITicket } from "@/interfaces/ITicket";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import { TableFilters } from "@/components/dashboard/client/TableFilters";
 
@@ -26,13 +25,17 @@ const AssignedTicket = () => {
   const { data, isLoading } = useQuery<IResponse<ITicket>, Error>({
     queryKey: ["agents", page, perPage, debouncedQuery, status, priority],
     queryFn: () =>
-      getUserTickets({page, perPage, query:debouncedQuery, status, priority}),
+      getUserTickets({
+        page,
+        perPage,
+        query: debouncedQuery,
+        status,
+        priority,
+      }),
     staleTime: 5000,
   });
 
-  const handleAdd = () => {
-    navigate("add");
-  };
+  
 
   const handleUpdate = (id: string) => {
     navigate(`/agent/tickets/${id}`);
@@ -49,12 +52,6 @@ const AssignedTicket = () => {
             Manage your tickets here.
           </p>
         </div>
-      </div>
-      <div className="w-full flex justify-end">
-        <Button size={"sm"} onClick={handleAdd} variant={"default"}>
-          <PlusIcon />
-          New Ticket
-        </Button>
       </div>
 
       <DataTable<ITicket, ColumnDef<ITicket>>

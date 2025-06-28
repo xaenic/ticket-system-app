@@ -25,7 +25,13 @@ const Ticket = () => {
   const { data, isLoading } = useQuery<IResponse<ITicket>, Error>({
     queryKey: ["agents", page, perPage, debouncedQuery, status, priority],
     queryFn: () =>
-      getUserTickets({page, perPage, query:debouncedQuery, status, priority}),
+      getUserTickets({
+        page,
+        perPage,
+        query: debouncedQuery,
+        status,
+        priority,
+      }),
     staleTime: 5000,
   });
 

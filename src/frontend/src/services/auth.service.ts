@@ -102,15 +102,19 @@ export const registerService = async (
   avatar: File | null
 ): Promise<IAuthResponse> => {
   try {
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword ?? "");
+
+    if (avatar != null) {
+      formData.append("avatar", avatar);
+    }
     const response = await api.post(
       "/register",
-      {
-        name,
-        email,
-        password,
-        password_confirmation: confirmPassword,
-        avatar,
-      },
+      formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
       }
@@ -139,19 +143,21 @@ export const updateProfile = async (
   new_password: string | null,
   avatar: File | null
 ): Promise<IAuthResponse> => {
+
   try {
-    const response = await api.post(
-      "users/profile",
-      {
-        name,
-        avatar,
-        password,
-        new_password,
-      },
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("password", password);
+    formData.append("new_password", new_password ?? "");
+    formData.append("asdsadsads", new_password ?? "");
+
+    if (avatar != null) {
+      formData.append("avatar", avatar);
+    }
+
+    const response = await api.post("users/profile", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
     if (response.status !== 200 && response.status !== 201) {
       throw new Error("Registration failed");

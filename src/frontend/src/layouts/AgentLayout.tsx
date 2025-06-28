@@ -27,12 +27,11 @@ export const AgentLayout = () => {
     <div className="">
       <SidebarProvider>
         <AppSidebar items={navData} />
-        <main className="flex-1">
+
+        <div className="w-full flex flex-col  bg-gradient-to-tr from-blue-50 to-purple-50">
           <TopBar />
-          <div className="flex-1">
-            <Outlet />
-          </div>
-        </main>
+          <Outlet />
+        </div>
       </SidebarProvider>
     </div>
   );

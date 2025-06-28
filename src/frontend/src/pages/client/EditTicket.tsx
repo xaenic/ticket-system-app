@@ -32,6 +32,8 @@ import type { Attachment, ITicket } from "@/interfaces/ITicket";
 import { attachmentToFile } from "@/utils/formatfile";
 import TicketView from "@/components/dashboard/client/TicketView";
 import { NewAttachedFiles } from "@/components/dashboard/client/TicketForm/NewAttachedFiles";
+import ViewTicketSkeleton from "@/components/ViewTicketSkeleton";
+import NotFound from "@/components/NotFound";
 
 const EditTicket = () => {
 
@@ -130,11 +132,11 @@ const EditTicket = () => {
     }
   }, [data, form]);
   return isError ? (
-    <p>Not found </p>
+   <NotFound/>
   ) : isLoading ? (
-    <p>Loading</p>
+   <ViewTicketSkeleton/>
   ) : (
-    <main className="p-8 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="p-4 md:p-8 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -215,7 +217,7 @@ const EditTicket = () => {
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     name="department_id"
                     control={form.control}

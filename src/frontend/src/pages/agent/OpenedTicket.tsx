@@ -30,7 +30,7 @@ const OpenedTicket = () => {
     <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tickets</h1>
           <p className="text-muted-foreground text-sm">
             Claim a ticket to start working on it
           </p>

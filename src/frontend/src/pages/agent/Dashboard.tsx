@@ -32,7 +32,6 @@ const Dashboard = () => {
       title: "Resolved",
       count: data?.stats?.resolved || 0,
     },
-
   ];
   return (
     <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
@@ -63,9 +62,9 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2">
         <RecentActivity
-        
-        recents={data?.recents || []}
-        subtitle="Latest update from your works"/>
+          recents={data?.recents || []}
+          subtitle="Latest update from your works"
+        />
       </div>
     </main>
   );

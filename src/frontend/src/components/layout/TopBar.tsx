@@ -8,15 +8,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { Bell, Settings, LogOut, User } from "lucide-react";
+import { Bell,LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BASE_API_URL } from "@/utils/api";
 import { SidebarTrigger } from "../ui/sidebar";
+import { getInitials } from "@/utils/helpers";
 
 export const TopBar = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,15 +30,6 @@ export const TopBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   const navigate = useNavigate();
   return (
     <div
@@ -49,7 +41,7 @@ export const TopBar = () => {
         {/* <h2 className="text-lg font-semibold text-gray-800">
           Welcome back, {user?.name}
         </h2> */}
-        <SidebarTrigger/>
+        <SidebarTrigger />
       </div>
 
       <div className="flex items-center gap-4">
@@ -64,7 +56,12 @@ export const TopBar = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={BASE_API_URL?.replace("/api","/storage/")+user?.avatar} alt={user?.name} />
+                <AvatarImage
+                  src={
+                    BASE_API_URL?.replace("/api", "/storage/") + user?.avatar
+                  }
+                  alt={user?.name}
+                />
                 <AvatarFallback className="bg-blue-500 text-white">
                   {user?.name ? getInitials(user.name) : "U"}
                 </AvatarFallback>
@@ -90,13 +87,10 @@ export const TopBar = () => {
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={logout}
+              onClick={() => navigate("/logout")}
               className="text-red-600 focus:text-red-600"
             >
               <LogOut className="mr-2 h-4 w-4" />

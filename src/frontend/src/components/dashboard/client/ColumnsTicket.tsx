@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { ITicket } from "@/interfaces/ITicket";
+import { getPriorityColor } from "@/utils/colors";
 import { formatDateInWords } from "@/utils/formatDate";
 import type { ColumnDef } from "@tanstack/react-table";
 import { FilePenLine } from "lucide-react";
@@ -16,11 +17,7 @@ const statusColorCodes = {
   rejected: "bg-red-100 text-red-700 border border-red-200",
 };
 
-const priorityColorCodes = {
-  low: "bg-green-100 text-green-800 border-green-300",
-  medium: "bg-yellow-100 text-yellow-800 border-yellow-300",
-  high: "bg-red-100 text-red-800 border-red-300",
-};
+
 export const columns = ({ onEdit }: ColumnsProps): ColumnDef<ITicket>[] => [
   {
     accessorKey: "id",
@@ -72,11 +69,9 @@ export const columns = ({ onEdit }: ColumnsProps): ColumnDef<ITicket>[] => [
     cell: ({ row }) => {
       return (
         <span
-          className={`${
-            priorityColorCodes[
-              row.getValue("priority") as keyof typeof priorityColorCodes
-            ]
-          } px-2 py-1 uppercase rounded-md font-semibold text-xs`}
+          className={`${getPriorityColor(
+            row.getValue("priority")
+          )} px-2 py-1 uppercase rounded-md font-semibold text-xs`}
         >
           {row.getValue("priority")}
         </span>

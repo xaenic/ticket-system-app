@@ -68,8 +68,7 @@ const AddTicket = () => {
             });
           }
         );
-      }else
-      toast.error("Something went wrong");
+      } else toast.error("Something went wrong");
     }
     setLoading(false);
   };
@@ -79,7 +78,7 @@ const AddTicket = () => {
     high: "Critical issue requiring immediate attention",
   };
   return (
-    <main className="p-8 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="p-4 md:p-8 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -123,7 +122,7 @@ const AddTicket = () => {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <FormField
                 name="department_id"
                 control={form.control}
@@ -227,10 +226,9 @@ const AddTicket = () => {
             />
 
             <div className="flex justify-end items-center">
-              <Button disabled={loading} type="submit">Submit
-
-
-                {loading && <Loader2 className="animate-spin w-4 h-4"/>}
+              <Button disabled={loading} type="submit">
+                Submit
+                {loading && <Loader2 className="animate-spin w-4 h-4" />}
               </Button>
             </div>
           </form>

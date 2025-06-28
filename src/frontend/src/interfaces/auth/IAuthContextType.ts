@@ -7,4 +7,6 @@ export interface IAuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, confirmPassword: string, avatar?: File | null) => Promise<void>;
   logout: () => Promise<void>;
+  checkAuthStatus: () => Promise<void>;
+
 }

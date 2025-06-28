@@ -10,6 +10,7 @@ import { PageLoader } from "@/components/ui/pageLoader";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { ClientLayout } from "@/layouts/ClientLayout";
 import { AgentLayout } from "@/layouts/AgentLayout";
+import { Logout } from "@/pages/auth/Logout";
 
 export default function AppRoutes() {
   return (
@@ -19,8 +20,9 @@ export default function AppRoutes() {
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
         </Route>
-
+        <Route path="/logout" element={<Logout />} />
         <Route path="admin" element={<ProtectedRoute role="admin" />}>
           <Route element={<AdminLayout />}>
             {AdminRoutes.map((route, index) => {

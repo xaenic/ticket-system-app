@@ -23,7 +23,7 @@ const Department = () => {
 
   const { data, isLoading } = useQuery<IResponse<IDepartment>, Error>({
     queryKey: ["departments", page, perPage, debouncedQuery],
-    queryFn: () => getDepartments(page, perPage+"", debouncedQuery),
+    queryFn: () => getDepartments(page, perPage + "", debouncedQuery),
     staleTime: 5000,
   });
 
@@ -45,12 +45,12 @@ const Department = () => {
     setActive("delete");
   };
   return (
-    <main className="min-h-screen space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className=" p-4 w-full">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your departments effectively
+            Manage your departments effectivelys
           </p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ChartColumnBigIcon, Ticket} from "lucide-react";
+import { ChartColumnBigIcon, Ticket } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 export const ClientLayout = () => {
@@ -16,19 +16,16 @@ export const ClientLayout = () => {
       icon: <Ticket size={22} />,
       url: "tickets",
     },
-
-   
   ];
   return (
     <div className="">
       <SidebarProvider>
         <AppSidebar items={navData} />
-        <main className="flex-1">
+
+        <div className="w-full flex flex-col  bg-gradient-to-tr from-blue-50 to-purple-50">
           <TopBar />
-          <div className="flex-1">
-            <Outlet />
-          </div>
-        </main>
+          <Outlet />
+        </div>
       </SidebarProvider>
     </div>
   );

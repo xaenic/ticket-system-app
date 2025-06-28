@@ -57,7 +57,7 @@ const profileSchema = z
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, checkAuthStatus } = useAuth();
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -88,6 +88,7 @@ const Profile = () => {
 
       const {name,currentPassword,new_password} = data;
       await updateProfile(name,currentPassword,new_password || null, selectedFile || null);
+      checkAuthStatus();
       profileForm.reset();
       toast.success("Profile updated successfully!");
     } catch (error) {

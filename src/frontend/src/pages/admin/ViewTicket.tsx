@@ -16,6 +16,8 @@ import TicketView from "@/components/dashboard/client/TicketView";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { IResponse } from "@/interfaces/IResponse";
+import ViewTicketSkeleton from "@/components/ViewTicketSkeleton";
+import NotFound from "@/components/NotFound";
 
 const ViewTicket = () => {
 
@@ -76,11 +78,11 @@ const ViewTicket = () => {
   }, [data]);
 
   return isError ? (
-    <p>Not found </p>
+    <NotFound />
   ) : isLoading ? (
-    <p>Loading</p>
+    <ViewTicketSkeleton />
   ) : (
-    <main className="p-8 space-y-4 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="p-4 md:p-8 space-y-4 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
