@@ -5,8 +5,10 @@ namespace App\Services;
 
 
 use App\Models\User;
-
+use \Illuminate\Http\UploadedFile;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 class userService {
 
@@ -19,12 +21,13 @@ class userService {
 
     
     public function createUser(array $data) {
-
-        if (array_key_exists('avatar', $data)) {
-            $data['avatar'] = $data->file('avatar')->store('avatars', 'public');
+         if (array_key_exists('avatar', $data) ) {
+               $data['avatar'] = $data['avatar'] instanceof UploadedFile
+               ? $data['avatar']->store('avatars', 'public') : $data->file('avatar')->store('avatars', 'public');
         } else {
             $data['avatar'] = null; 
         }
+        
         return $this->user->create($data);
     }
     
@@ -32,33 +35,43 @@ class userService {
 
         $user = $this->user->find($id);
 
-        if(!$user) return null;
+        if(!$user) throw new ModelNotFoundException("User not found");
 
         if (array_key_exists('avatar', $data)) {
-            $data['avatar'] = $data->file('avatar')->store('avatars', 'public');
+              $data['avatar'] = $data['avatar'] instanceof UploadedFile
+               ? $data['avatar']->store('avatars', 'public') : $data->file('avatar')->store('avatars', 'public');
         } else {
             $data['avatar'] = null; // Set a default value if no avatar is uploaded
         }
-
-        return $user->update($data);
+        $user->update($data);
+        return $user;
     }
 
     public function assignDepartment(int $id, int $departmentId) {
         $user = $this->user->find($id);
+        
+        if(!$user) throw new ModelNotFoundException("User not found");
+
         $user->department_id = $departmentId;
         return $user->save();
     }
     
     public function deleteUser(int $id) {
-        return $this->user->find($id)->delete();
+        $user = $this->user->find($id);
+        if(!$user) throw new ModelNotFoundException("User not found");
+        return $user->delete();
     }
     
     public function getUserById(int $id) {
-        return $this->user->find($id);
+        $user = $this->user->find($id);
+        if(!$user) throw new ModelNotFoundException("User not found");
+        return $user;
     }
 
     public function getUserByEmail(string $email) {
-        return $this->user->where('email', $email)->first();
+        $user = $this->user->where('email', $email)->first();
+        if(!$user) throw new ModelNotFoundException("User not found");
+        return $user;
     }
     public function getAllUsers(int $page = 1, int $perpage = 10) {
         return $this->user->paginate($perpage, ['*'], 'page', $page);
@@ -76,11 +89,13 @@ class userService {
     }
 
     public function getUserCountsByRole(string $role) {
+
         return $this->user->role($role)->count();
     }
     
     public function getOpenedTickets($id,int $page = 1, int $perpage = 10, $query = "") {
-        $user = $this->user->with('department')->findOrFail($id);
+        $user = $this->user->with('department')->find($id);
+        if(!$user) throw new ModelNotFoundException("User not found");
         
         $tickets =  $user->department ? $user->department->tickets()->with('client')->where('status','open')->paginate($perpage, ['*'], 'page', $page) : collect() ;
 
