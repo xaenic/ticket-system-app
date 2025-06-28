@@ -1,7 +1,7 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
-
+export const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
+  baseURL: BASE_API_URL
 });
 const token = localStorage.getItem("token");
 if (token) api.defaults.headers.common["Authorization"] = `Bearer ${token}`;

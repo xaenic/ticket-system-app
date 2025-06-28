@@ -16,7 +16,7 @@ import { DeleteAgent } from "@/components/dashboard/agent/DeleteAgent";
 
 const Agent = () => {
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState("10");
+  const [perPage, setPerPage] = useState(10);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [active, setActive] = useState<"add" | "edit" | "delete">("add");
@@ -25,7 +25,7 @@ const Agent = () => {
 
   const { data, isLoading } = useQuery<IResponse<IUser>, Error>({
     queryKey: ["agents", page, perPage, debouncedQuery],
-    queryFn: () => getAgents(page, perPage, debouncedQuery),
+    queryFn: () => getAgents(page, perPage+"", debouncedQuery),
     staleTime: 5000,
   });
   const { data: departments } = useQuery<IResponse<IDepartment>, Error>({
@@ -49,11 +49,12 @@ const Agent = () => {
       id: id,
       name: "",
       email: "",
+      
     });
     setActive("delete");
   };
   return (
-    <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="min-h-screen p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Agents</h1>

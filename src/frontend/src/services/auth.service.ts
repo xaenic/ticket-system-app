@@ -23,7 +23,7 @@ export const loginService = async (
       }
       throw error.response.data.messages;
     }
-  
+
     throw new Error("Something went wrong during login");
   }
 };
@@ -79,11 +79,11 @@ export const clearAuthState = (): void => {
 export const checkStatus = async (): Promise<IAuthResponse> => {
   try {
     const response = await api.get("/me");
-    
+
     if (response.status !== 200) {
       throw new Error("Failed to fetch user data");
     }
-    
+
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response?.data) {
@@ -98,15 +98,60 @@ export const registerService = async (
   name: string,
   email: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
+  avatar: File | null
 ): Promise<IAuthResponse> => {
   try {
-    const response = await api.post("/register", {
-      name,
-      email,
-      password,
-      password_confirmation: confirmPassword,
-    });
+    const response = await api.post(
+      "/register",
+      {
+        name,
+        email,
+        password,
+        password_confirmation: confirmPassword,
+        avatar,
+      },
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    if (response.status !== 200 && response.status !== 201) {
+      throw new Error("Registration failed");
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError && error.response?.data) {
+      const exception = error.response.data?.message;
+      if (exception) {
+        throw new Error(exception);
+      }
+      throw error.response.data.messages;
+    }
+    throw new Error("Something went wrong during registration");
+  }
+};
+
+export const updateProfile = async (
+  name: string,
+  password: string,
+  new_password: string | null,
+  avatar: File | null
+): Promise<IAuthResponse> => {
+  try {
+    const response = await api.post(
+      "users/profile",
+      {
+        name,
+        avatar,
+        password,
+        new_password,
+      },
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
 
     if (response.status !== 200 && response.status !== 201) {
       throw new Error("Registration failed");

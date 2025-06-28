@@ -31,7 +31,7 @@ const RecentActivity = ({
       <CardContent className="space-y-4">
         <div className="space-y-4">
           {recents.map((ticket) => (
-            <div>
+            <div key={ticket.id}>
               <div className="flex items-center justify-between">
                 <div className="space-y-1 flex ">
                   <Avatar>

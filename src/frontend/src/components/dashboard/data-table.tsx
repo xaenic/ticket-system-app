@@ -69,14 +69,14 @@ export function DataTable<TData, TValue>({
     state: {
       pagination: {
         pageIndex: 0, // React Table uses 0-based indexing
-        pageSize:perPage,
+        pageSize: perPage,
       },
     },
     pageCount: lastPage,
   });
 
   return (
-    <div className="rounded-md border-none bg-white ">
+    <div className="w-full rounded-md border-none bg-white ">
       <div className="flex p-4 justify-between items-center">
         <div>
           <Input
@@ -98,77 +98,82 @@ export function DataTable<TData, TValue>({
           {SideButton && <SideButton />}
         </div>
       </div>
-      <Table>
-        <TableHeader className="bg-slate-100 ">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow className="border-none p-4" key={headerGroup.id}>
-              {headerGroup.headers
-                .filter((header) => !header.column.columnDef.enableHiding)
-                .map((header) => {
-                  return (
-                    <TableHead
-                      className="p-4 font-medium text-slate-800"
-                      key={header.id}
+      <div className="">
+        <Table>
+          <TableHeader className="bg-slate-100 ">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow className="border-none p-4" key={headerGroup.id}>
+                {headerGroup.headers
+                  .filter((header) => !header.column.columnDef.enableHiding)
+                  .map((header) => {
+                    return (
+                      <TableHead
+                        className="p-4 font-medium text-slate-800"
+                        key={header.id}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody className="relative">
+            {isLoading ? (
+              <>
+                {[...Array(3)].map((_, index) => (
+                  <TableRow className="border-none" key={index}>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center relative"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody className="relative">
-          {isLoading ? (
-            <>
-              {[...Array(3)].map((_, index) => (
-                <TableRow className="border-none" key={index}>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center relative"
-                  >
-                    {index === 1 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Loader2 className="mr-2 h-8 w-8 animate-spin text-slate-600" />
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </>
-          ) : table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                className="border-none"
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row
-                  .getVisibleCells()
-                  .filter((h) => !h.column.columnDef.enableHiding)
-                  .map((cell) => (
-                    <TableCell className=" p-4" key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                      {index === 1 && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Loader2 className="mr-2 h-8 w-8 animate-spin text-slate-600" />
+                        </div>
                       )}
                     </TableCell>
-                  ))}
+                  </TableRow>
+                ))}
+              </>
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  className="border-none"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row
+                    .getVisibleCells()
+                    .filter((h) => !h.column.columnDef.enableHiding)
+                    .map((cell) => (
+                      <TableCell className=" p-4" key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results
+                </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <Separator className="border border-slate-100" />
       <div className="  flex items-center justify-between space-x-2 p-2 p-3">
         <div className="text-xs text-muted-foreground"></div>

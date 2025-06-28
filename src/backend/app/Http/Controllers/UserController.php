@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Validations\UserValidation as UserRequest;
+use App\Validations\ProfileValidation as ProfileRequest;
 use App\Validations\AssignmentDepartmentValidation as AssignmentRequest;
+use Illuminate\Support\Facades\Hash;
 
 use App\Services\UserService;
 
 use Spatie\Permission\Models\Role;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 use Exception;
 
@@ -24,7 +27,7 @@ class UserController extends Controller
         $this->userService = $userService;
 
         $this->middleware(['auth:api']);
-         $this->middleware('role:admin')->except(['openedTickets']);
+         $this->middleware('role:admin')->except(['openedTickets', 'profileUpdate']);
     }
 
     public function index() {
@@ -167,6 +170,31 @@ class UserController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+     public function profileUpdate(ProfileRequest $request) {
+
+        $data=  $request->validated();
+        if (!Hash::check($data['password'], auth()->user()->password)) {
+            return response()->json(['message' => 'Invalid password entered'], 403);
+        }
+        try {
+            if(!empty($data['new_password'])) {
+                $data['password'] =$data['new_password'];
+            }
+            if (is_null($data['avatar'] ?? null)) {
+                unset($data['avatar']);
+            }
+            $id = auth()->id();
+
+            $result = $this->userService->updateUser($id, $data);
+            return response()->json($result, 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+
             ], 500);
         }
     }

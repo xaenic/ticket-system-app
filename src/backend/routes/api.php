@@ -52,6 +52,8 @@ Route::prefix('users')
         Route::put('/{id}', [UserController::class, 'update'])->where('id', '[0-9]+');
         Route::patch('/{id}', [UserController::class, 'assign'])->where('id', '[0-9]+');
 
+        Route::post('/profile', [UserController::class, 'profileUpdate']);
+
 });
 Route::get('/dashboard', [DashboardController::class, 'index']);
 Route::get('/dashboard/data', [DashboardController::class, 'userData']);

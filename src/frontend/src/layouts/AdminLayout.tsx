@@ -1,6 +1,12 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { TopBar } from "@/components/layout/TopBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Building2, ChartColumnBigIcon, Ticket,  UsersRound } from "lucide-react";
+import {
+  Building2,
+  ChartColumnBigIcon,
+  Ticket,
+  UsersRound,
+} from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 export const AdminLayout = () => {
@@ -20,7 +26,7 @@ export const AdminLayout = () => {
       title: "Agents",
       icon: <UsersRound size={20} />,
       url: "agents",
-    },  
+    },
 
     {
       title: "Tickets",
@@ -32,7 +38,12 @@ export const AdminLayout = () => {
     <div className="">
       <SidebarProvider>
         <AppSidebar items={navData} />
-        <Outlet />
+        <main className="flex-1">
+          <TopBar />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+        </main>
       </SidebarProvider>
     </div>
   );

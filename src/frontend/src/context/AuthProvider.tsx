@@ -51,8 +51,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <Navigate to={'/dashboard'} />
   };
 
-  const register = async (name: string, email: string, password: string, confirmPassword: string) => {
-    const { user, token } = await registerService(name, email, password, confirmPassword);
+  const register = async (name: string, email: string, password: string, confirmPassword: string, avatar?: File |null ) => {
+    const { user, token } = await registerService(name, email, password, confirmPassword, avatar || null);
     setUser(user);
     setIsAuthenticated(true);
     if (token) storeAuthState(token);

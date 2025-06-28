@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Validations\UserValidation as UserRequest;
 use App\Validations\UserLoginValidation as LoginRequest;
+use Spatie\Permission\Models\Role;
 
 use App\Services\UserService;
 
@@ -36,6 +37,11 @@ class AuthController extends Controller
         $data = $request->validated();
 
         $user = $this->userService->createUser($data);
+        $user->assignRole(Role::where('name','client')->first());
+
+        if (is_null($data['avatar'] ?? null)) {
+            unset($data['avatar']);
+        }
         $token = $user->createToken('Personal Access Token')->accessToken;
         
         return response()->json([
@@ -44,6 +50,7 @@ class AuthController extends Controller
                 "name" => $user->name,
                 "id" => $user->id,
                 "email" => $user->email,
+                "avatar" => $user->avatar,
                 "role" => $user->roles->first()->name ?? null
             ],
             'token' => $token
@@ -71,6 +78,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'id' => $user->id,
                     'email' => $user->email,
+                    'avatar' => $user->avatar,
                     'role' => $user->roles->first()->name ?? null
                 ],
                 'token' => $token
@@ -101,6 +109,7 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'avatar' => $user->avatar,
                     'role' => $user->roles->first()->name ?? null
                 ]
             ]);

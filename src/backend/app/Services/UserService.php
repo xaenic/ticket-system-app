@@ -32,7 +32,6 @@ class userService {
     }
     
     public function updateUser(int $id, array $data) {
-
         $user = $this->user->find($id);
 
         if(!$user) throw new ModelNotFoundException("User not found");

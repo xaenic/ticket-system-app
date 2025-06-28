@@ -14,7 +14,7 @@ import { DeleteDepartment } from "@/components/dashboard/department/DeleteDepart
 
 const Department = () => {
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState("10");
+  const [perPage, setPerPage] = useState(10);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [active, setActive] = useState<"add" | "edit" | "delete">("add");
@@ -23,7 +23,7 @@ const Department = () => {
 
   const { data, isLoading } = useQuery<IResponse<IDepartment>, Error>({
     queryKey: ["departments", page, perPage, debouncedQuery],
-    queryFn: () => getDepartments(page, perPage, debouncedQuery),
+    queryFn: () => getDepartments(page, perPage+"", debouncedQuery),
     staleTime: 5000,
   });
 
@@ -45,7 +45,7 @@ const Department = () => {
     setActive("delete");
   };
   return (
-    <main className="p-4 space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
+    <main className="min-h-screen space-y-6 w-full bg-gradient-to-tr from-blue-50 to-purple-50">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Departments</h1>

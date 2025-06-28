@@ -17,19 +17,23 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { registerSchema } from "@/utils/formSchema";
-import { Loader2 } from "lucide-react";
+import { Loader2, Camera, Upload } from "lucide-react";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export const Register = () => {
   const { register } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -41,11 +45,58 @@ export const Register = () => {
     },
   });
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    // Store the file for later upload
+    setSelectedFile(file);
+
+    // Create image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setSelectedImage(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     const { name, email, password, confirmPassword } = values;
     setLoading(true);
     try {
-      await register(name, email, password, confirmPassword);
+      await register(name, email, password, confirmPassword, selectedFile || null);
+      
+      // TODO: Upload avatar if selected
+      if (selectedFile) {
+        console.log('Uploading avatar:', selectedFile);
+        // Add avatar upload API call here
+      }
+      
       toast.success("Registration successful!");
       navigate("/dashboard", { replace: true });
     } catch (error) {
@@ -60,8 +111,8 @@ export const Register = () => {
             });
           }
         );
-      }else
-      toast.error("Something went wrong");
+      } else
+        toast.error("Something went wrong");
     }
     setLoading(false);
   };
@@ -87,6 +138,42 @@ export const Register = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-6">
+              {/* Avatar Upload Section */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <Avatar className="h-20 w-20 cursor-pointer" onClick={handleAvatarClick}>
+                    <AvatarImage src={selectedImage || undefined} alt="Profile" />
+                    <AvatarFallback className="bg-blue-500 text-white text-lg">
+                      {form.watch('name') ? getInitials(form.watch('name')) : <Upload size={20} />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1.5 cursor-pointer hover:bg-blue-600 transition-colors"
+                       onClick={handleAvatarClick}>
+                    <Camera size={12} className="text-white" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  {selectedImage ? (
+                    <>
+                      <p className="text-sm text-gray-600 font-medium">Profile picture selected</p>
+                      <p className="text-xs text-gray-500">Click to change</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-600">Upload profile picture</p>
+                      <p className="text-xs text-gray-500">Optional • JPG, PNG up to 5MB</p>
+                    </>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </div>
+
               <FormField
                 name="name"
                 control={form.control}

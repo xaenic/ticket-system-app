@@ -1,4 +1,3 @@
-import * as React from "react";
 
 import {
   Select,
@@ -12,11 +11,11 @@ import {
 export function RowsPerPage({
   onValueChange,
 }: {
-  onValueChange: (value: string ) => void;
+  onValueChange: (value: number ) => void;
   rowsPerpage: number;
 }) {
   return (
-    <Select defaultValue="10" onValueChange={onValueChange}>
+    <Select defaultValue="10" onValueChange={(value) => onValueChange(Number(value))}>
       <SelectTrigger className="w-18">
         <SelectValue />
       </SelectTrigger>

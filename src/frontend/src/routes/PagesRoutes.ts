@@ -21,6 +21,10 @@ export const AdminRoutes = [
     path: "tickets/:id",
     component: lazy(() => import("@/pages/admin/ViewTicket")),
   },
+   {
+    path: "profile",
+    component: lazy(() => import("@/pages/Profile")),
+  },
 ];
 
 export const ClientRoutes = [
@@ -40,6 +44,10 @@ export const ClientRoutes = [
     path: "tickets/:id",
     component: lazy(() => import("@/pages/client/EditTicket")),
   },
+   {
+    path: "profile",
+    component: lazy(() => import("@/pages/Profile")),
+  },
 ];
 
 export const AgentRoutes = [
@@ -58,5 +66,9 @@ export const AgentRoutes = [
   {
     path: "tickets/:id",
     component: lazy(() => import("@/pages/agent/ViewTicket")),
+  },
+  {
+    path: "profile",
+    component: lazy(() => import("@/pages/Profile")),
   },
 ];

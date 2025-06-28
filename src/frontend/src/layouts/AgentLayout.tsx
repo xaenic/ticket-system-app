@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { TopBar } from "@/components/layout/TopBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ChartColumnBigIcon, Ticket } from "lucide-react";
 import { Outlet } from "react-router-dom";
@@ -26,7 +27,12 @@ export const AgentLayout = () => {
     <div className="">
       <SidebarProvider>
         <AppSidebar items={navData} />
-        <Outlet />
+        <main className="flex-1">
+          <TopBar />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+        </main>
       </SidebarProvider>
     </div>
   );

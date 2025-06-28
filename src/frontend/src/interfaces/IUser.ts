@@ -7,7 +7,7 @@ export interface IUser {
   email: string;
   role?: string;
   department?: IDepartment
-  avatar:string;
+  avatar?:string;
 }
 
 
