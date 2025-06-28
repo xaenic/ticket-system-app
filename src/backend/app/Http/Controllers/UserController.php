@@ -183,9 +183,7 @@ class UserController extends Controller
             if(!empty($data['new_password'])) {
                 $data['password'] =$data['new_password'];
             }
-            if (is_null($data['avatar'] ?? null)) {
-                unset($data['avatar']);
-            }
+           
             $id = auth()->id();
 
             $result = $this->userService->updateUser($id, $data);

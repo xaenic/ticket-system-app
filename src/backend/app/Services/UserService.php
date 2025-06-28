@@ -24,9 +24,7 @@ class userService {
          if (array_key_exists('avatar', $data) ) {
                $data['avatar'] = $data['avatar'] instanceof UploadedFile
                ? $data['avatar']->store('avatars', 'public') : $data->file('avatar')->store('avatars', 'public');
-        } else {
-            $data['avatar'] = null; 
-        }
+        } 
         
         return $this->user->create($data);
     }
@@ -39,9 +37,7 @@ class userService {
         if (array_key_exists('avatar', $data)) {
               $data['avatar'] = $data['avatar'] instanceof UploadedFile
                ? $data['avatar']->store('avatars', 'public') : $data->file('avatar')->store('avatars', 'public');
-        } else {
-            $data['avatar'] = null; // Set a default value if no avatar is uploaded
-        }
+        } 
         $user->update($data);
         return $user;
     }

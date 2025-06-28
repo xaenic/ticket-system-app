@@ -17,7 +17,7 @@ class ProfileValidation extends FormRequest
          
         return [
             'name' => ['required', 'string', 'max:255'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'], 
+            'avatar' => [ 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'], 
             'password' => ['nullable','string', 'min:8'],
             'new_password' => ['nullable', 'string', 'min:8'],
         ];

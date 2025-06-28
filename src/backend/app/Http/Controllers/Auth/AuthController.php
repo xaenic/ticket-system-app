@@ -39,9 +39,7 @@ class AuthController extends Controller
         $user = $this->userService->createUser($data);
         $user->assignRole(Role::where('name','client')->first());
 
-        if (is_null($data['avatar'] ?? null)) {
-            unset($data['avatar']);
-        }
+      
         $token = $user->createToken('Personal Access Token')->accessToken;
         
         return response()->json([

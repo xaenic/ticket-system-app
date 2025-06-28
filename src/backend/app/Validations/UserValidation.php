@@ -17,7 +17,7 @@ class UserValidation extends FormRequest
          
         return [
             'name' => ['required', 'string', 'max:255'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'], // Optional avatar field
+            'avatar' => [ 'sometimes','image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'], // Optional avatar field
             'email' => [ $this->isMethod('PUT') ? 'sometimes' : 'required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => [$this->isMethod('PUT') ? 'sometimes' : 'required', 'string', 'min:8', 'confirmed'],
             'department_id' => ['nullable','string', 'exists:departments,id'], // Optional department ID

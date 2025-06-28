@@ -103,6 +103,7 @@ class TicketService {
         $query->with('responses')->with('responses.attachments')->with('responses.user');  
         $query->with('assigneduser');  
         $query->with('department');  
+        $query->with('client');  
         $query->with('attachments')->with('attachments.uploadedBy');  
         $result = $query->where('id',$id)->first();
 
@@ -128,7 +129,7 @@ class TicketService {
         if($role === 'admin') $ticketQuery->with('assigneduser');
 
 
-         return $ticketQuery->with('client')->with('department')->paginate($perpage, ['*'], 'page', $page);
+         return $ticketQuery->with('client')->with('department')->orderBy('created_at','desc')->paginate($perpage, ['*'], 'page', $page);
     }
 
     public function getRecentTickets(string $role, int $limit = 5) {
