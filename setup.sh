@@ -84,6 +84,10 @@ docker-compose exec laravel php artisan passport:install --force --no-interactio
 print_step "Running database seeders..."
 docker-compose exec laravel php artisan db:seed 
 
+print_step "Setting up storage link"
+docker-compose exec laravel php artisan storage:link
+
+
 # Clear and cache config
 print_step "Clearing and caching configuration..."
 docker-compose exec laravel php artisan config:clear
