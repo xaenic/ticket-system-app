@@ -46,7 +46,7 @@ const Department = () => {
   };
   return (
     <main className=" p-4 w-full">
-      <div className="flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
           <p className="text-muted-foreground text-sm">
