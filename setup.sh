@@ -63,32 +63,31 @@ until docker-compose exec mysql mysqladmin ping -h"localhost" --silent; do
     sleep 2
 done
 print_status "MySQL is ready!"
-# sleep 10
-# Create database and user with proper permissions
+
 
 
 print_status "Waiting for Laravel container to be ready..."
 sleep 10
 
-# Generate Laravel application key
 print_step "Generating Laravel application key..."
 docker-compose exec laravel php artisan key:generate --force
 
-# Setup database user permissions
 
-# Run database migrations
+
 print_step "Running database migrations..."
 docker-compose exec laravel php artisan migrate --force --no-interaction
-docker-compose exec laravel php artisan passport:install --force --no-interaction
 
 print_step "Running database seeders..."
 docker-compose exec laravel php artisan db:seed 
+
+
+docker-compose exec laravel php artisan passport:install --force --no-interaction
+
 
 print_step "Setting up storage link"
 docker-compose exec laravel php artisan storage:link
 
 
-# Clear and cache config
 print_step "Clearing and caching configuration..."
 docker-compose exec laravel php artisan config:clear
 docker-compose exec laravel php artisan config:cache

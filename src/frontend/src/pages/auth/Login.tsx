@@ -57,8 +57,7 @@ export function Login() {
             });
           }
         );
-      }else
-      toast.error("Something went wrong");
+      } else toast.error("Something went wrong");
     }
     setLoading(false);
   };
@@ -70,7 +69,16 @@ export function Login() {
       >
         <Card className="w-full max-w-sm min-h-xl shadow-none border-none">
           <CardHeader>
-            <CardTitle className="text-center text-2xl">Sign In</CardTitle>
+            <CardTitle className="text-center text-2xl">
+              
+              <h1 className="text-2xl uppercase font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                TicketFlow
+              </h1>
+              <p className="text-xs text-gray-500 mt-1 font-medium tracking-wide">
+                TICKET ISSUE MANAGEMENT
+              </p>
+            </CardTitle>
+
             <CardDescription className="text-center mt-4">
               Don’t have an account? Get{" "}
               <Link
