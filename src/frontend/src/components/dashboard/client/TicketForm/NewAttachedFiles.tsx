@@ -16,7 +16,7 @@ export const NewAttachedFiles = ({
       <div className="space-y-2">
         {/* <h4 className="text-sm font-medium text-gray-700">Attached Files:</h4> */}
         <div className="space-y-2">
-          {newFiles.map((file: FileWithId, index: number) => (
+          {newFiles.map((file: FileWithId | File, index: number) => (
             <div
               key={index}
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
