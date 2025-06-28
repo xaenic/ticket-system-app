@@ -47,10 +47,12 @@ export const ResponseInput = () => {
       setMessage("");
       setSelectedFiles([]);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create ticket"
-      );
-    }
+          if (error instanceof Error) {
+            toast.error(error.message);
+          } else if (error instanceof Object) {
+            toast.error(error['message']);
+          } else toast.error("Something went wrong");
+        }
     setLoading(false);
   };
   return (
