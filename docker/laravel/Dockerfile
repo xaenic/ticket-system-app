@@ -35,15 +35,26 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Set environment variables for Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY . /var/www/html
+# Copy composer files first for better Docker layer caching
+COPY composer.json composer.lock ./
+
+# Install dependencies first
+RUN composer install --optimize-autoloader --no-scripts
+
+# Copy the rest of the application
+COPY . .
+
+# Run composer scripts after copying all files
+RUN composer dump-autoload --optimize
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-RUN composer update --no-dev --optimize-autoloader
-
 EXPOSE 8000
 
-# Start Laravel development server
+# Create an entrypoint script to handle dependencies
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+RUN composer install --optimize-autoloader --dev
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

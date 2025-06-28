@@ -68,6 +68,7 @@ print_status "MySQL is ready!"
 
 print_status "Waiting for Laravel container to be ready..."
 sleep 10
+# docker-compose exec laravel composer install --dev
 
 print_step "Generating Laravel application key..."
 docker-compose exec laravel php artisan key:generate --force
