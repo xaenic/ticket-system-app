@@ -1,24 +1,55 @@
-# version: '3.8'
-
 services:
+  react:
+    build:
+      context: .
+      dockerfile: ./docker/react/Dockerfile
+    container_name: ticket_react
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    networks:
+      - ticket-network
+    depends_on:
+      - laravel
+
+  laravel:
+    build: 
+      context: ./src/backend
+      dockerfile: ../../docker/laravel/Dockerfile
+    container_name: ticket_laravel
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/backend:/var/www/html
+      - ./docker/laravel/php.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - ticket-network
+    depends_on:
+      - mysql
+
   mysql:
     build: ./docker/mysql
-    container_name: pyreact_mysql
-    restart: always
+    container_name: ticket_mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: exam
-      MYSQL_USER: allan
-      MYSQL_PASSWORD: allan123
+      MYSQL_ROOT_PASSWORD: ${DB_ROOTPASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - pyreact-network
+      - ticket-network
 
 networks:
-  pyreact-network:
+  ticket-network:
     driver: bridge
 
 volumes:
