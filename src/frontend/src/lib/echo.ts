@@ -17,14 +17,14 @@ const token = localStorage.getItem('token');
 
 const echo = new Echo({
   broadcaster: 'pusher',
-  key: 'app-key',               // Must match SOKETI_DEFAULT_KEY from docker-compose
-  cluster: 'mt1',               // Can be any string; soketi ignores this
-  wsHost: window.location.hostname, // Use the browser's hostname
-  wsPort: 6001,
-  forceTLS: false,
-  disableStats: true,           // Disable Pusher stats which can cause connection issues
-  enabledTransports: ['ws', 'wss'], // Use websocket transport only
-  authEndpoint: 'http://10.147.19.68:8000/broadcasting/auth',
+  key: import.meta.env.VITE_PUSHER_APP_KEY || 'app-key',
+  cluster: 'mt1', 
+  wsHost: import.meta.env.VITE_PUSHER_HOST || window.location.hostname,
+  wsPort: parseInt(import.meta.env.VITE_PUSHER_PORT) || 6001,
+  forceTLS: import.meta.env.VITE_PUSHER_TLS === 'true',
+  disableStats: true, 
+  enabledTransports: ['ws', 'wss'], 
+  authEndpoint: import.meta.env.VITE_PUSHER_AUTH_ENDPOINT || 'http://localhost:8000/broadcasting/auth',
   auth: {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
