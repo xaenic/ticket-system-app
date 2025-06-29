@@ -9,6 +9,9 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketResponseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttachmentController;
+use App\Notifications\NewTicket;
+use App\Models\User;
+use App\Models\Ticket;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,12 +44,18 @@ Route::prefix('departments')
         Route::put('/{id}', [DepartmentController::class, 'update'])->where('id', '[0-9]+');
 });
 
+Route::get('/notifications/{status}', [UserController::class, 'notifications']);
+Route::patch('/notifications/{id}/read', [UserController::class, 'markAsRead']);
+Route::get('/messages', [UserController::class, 'responses']);
+
 Route::prefix('users')
     ->group(function () {
 
         Route::get('/', [UserController::class, 'index']);
         Route::get('/agents', [UserController::class, 'agents']);
 
+
+      
         //create agents
         Route::post('/', [UserController::class, 'store']);
 
@@ -84,5 +93,23 @@ Route::prefix('tickets')
         });
 });
 Route::get('/test', function () {
-    return response()->json(['message' => 'Admin access granted']);
+    // Get all users and notify them
+    $user = User::find(2);
+    
+    $ticket = Ticket::create([
+        'title' => 'asdsad Ticket Title',
+        'description' => 'This is a sample description for the ticket.',
+        'status' => 'open',        // example status
+        'priority' => 'high',      // example priority
+        'client_id' => 1,          // as you requested
+        'department_id' => 2,      // as you requested
+        'assigned_user_id' => null // or some user id if assigned
+    ]);
+    $users = User::where('department_id', 2)->get();
+
+    foreach ($users as $user) {
+        $user->notify(new NewTicket($ticket));
+    }
+
+    return response()->json(['message' => $ticket]);
 });

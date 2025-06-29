@@ -49,6 +49,7 @@ class AuthController extends Controller
                 "id" => $user->id,
                 "email" => $user->email,
                 "avatar" => $user->avatar,
+                
                 "role" => $user->roles->first()->name ?? null
             ],
             'token' => $token
@@ -77,6 +78,7 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'email' => $user->email,
                     'avatar' => $user->avatar,
+                    "department_id" => $user->department_id,
                     'role' => $user->roles->first()->name ?? null
                 ],
                 'token' => $token
@@ -108,6 +110,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'avatar' => $user->avatar,
+                    "department_id" => $user->department_id,
                     'role' => $user->roles->first()->name ?? null
                 ]
             ]);

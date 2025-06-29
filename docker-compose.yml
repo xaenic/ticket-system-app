@@ -48,6 +48,24 @@ services:
     networks:
       - ticket-network
 
+  soketi:
+    image: quay.io/soketi/soketi:latest-16-alpine
+    container_name: ticket_soketi
+    restart: unless-stopped
+    environment:
+      SOKETI_DEBUG: '1'
+      SOKETI_METRICS_SERVER_PORT: '9601'
+      SOKETI_DEFAULT_APP_ID: app-id
+      SOKETI_DEFAULT_KEY: app-key
+      SOKETI_DEFAULT_SECRET: app-secret
+      SOKETI_DEFAULT_CAPACITY: 100
+      SOKETI_DEFAULT_ENABLE_CLIENT_MESSAGES: 'true'
+      SOKETI_DEFAULT_ENABLE_USER_AUTHENTICATION: 'true'
+    ports:
+      - "6001:6001"
+    networks:
+      - ticket-network
+
 networks:
   ticket-network:
     driver: bridge

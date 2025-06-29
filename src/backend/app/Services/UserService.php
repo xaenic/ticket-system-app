@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
-class userService {
+class UserService {
 
     protected $user; 
 

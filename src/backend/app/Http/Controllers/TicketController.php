@@ -12,8 +12,10 @@ use App\Validations\StatusValidation as StatusRequest;
 use Exception;
 
 use App\Services\TicketService;
-
+use App\Models\User;
 use Spatie\Permission\Models\Role;
+use App\Notifications\NewTicket;
+use App\Notifications\TicketUpdate;
 
 class TicketController extends Controller
 {
@@ -40,7 +42,11 @@ class TicketController extends Controller
             $data['uploaded_by'] = auth()->id();
     
             $results = $this->ticketService->createTicket($data);
-            
+            $users = User::where('department_id', $results->department_id)->get();
+
+            foreach ($users as $user) {
+                $user->notify(new NewTicket($results->load('client')));
+            }
             return response()->json([
                 'status' => 'success',
             ], 201);
@@ -95,6 +101,9 @@ class TicketController extends Controller
             }
             $agent_id = auth()->id();
             $result = $this->ticketService->assignAgent($agent_id,$id);
+            
+            $user = $result->client;
+            $user->notify(new TicketUpdate($result->load('assigneduser')));
 
             return response()->json(['status' => 'success', 'message' => 'Agent assigned successfully'], 200);
         } catch(AuthorizationException $e) {
@@ -171,6 +180,9 @@ class TicketController extends Controller
                 $data = $request->validated();
 
                 $results = $this->ticketService->updateTicketStatus($data['status'],$id);
+
+                $user = $results->client;
+                $user->notify(new TicketUpdate($results->load('assigneduser')));
 
                 return response()->json([
                     'status' => 'success',

@@ -10,7 +10,10 @@ use App\Validations\AssignmentDepartmentValidation as AssignmentRequest;
 use Illuminate\Support\Facades\Hash;
 
 use App\Services\UserService;
-
+use App\Http\Resources\NotificationResource;
+use App\Http\Resources\PaginationResource;
+use App\Notifications\NewResponse;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -27,7 +30,7 @@ class UserController extends Controller
         $this->userService = $userService;
 
         $this->middleware(['auth:api']);
-         $this->middleware('role:admin')->except(['openedTickets', 'profileUpdate']);
+        $this->middleware('role:admin')->except(['openedTickets', 'profileUpdate', 'notifications', 'markAsRead','responses']);
     }
 
     public function index() {
@@ -164,6 +167,7 @@ class UserController extends Controller
             $query = $request->query('query',"");
 
             $result = $this->userService->getOpenedTickets($id, $page, $perPage, $query);
+            
 
             return response()->json($result, 200);
 
@@ -193,6 +197,120 @@ class UserController extends Controller
             return response()->json([
                 'message' => $e->getMessage(),
 
+            ], 500);
+        }
+    }
+    public function notifications(Request $request, $status) {
+
+        $user = auth()->user();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+     
+        try {
+            if($status !== 'all' && $status !== 'unread') {
+                return response()->json([
+                    'message' => 'Invalid status parameter. Use "all" or "unread".'
+                ], 400);
+            }
+            if($status === 'all') $results = $user->notifications()->where("type","!=", NewResponse::class)->paginate($perPage, ['*'], 'page', $page);
+
+            else $results = $user->unreadNotifications()->where("type","!=", NewResponse::class)->paginate($perPage, ['*'], 'page', $page);
+
+
+            $unreadCount = $user->unreadNotifications()->where("type","!=", NewResponse::class)->count();
+            $notificationsData = NotificationResource::collection($results->items());
+
+            $paginationData = (new PaginationResource($results))->toArray(request());
+            
+             return response()->json(array_merge(
+                    ['data' => $notificationsData],
+                    $paginationData,
+                    ['unread_count' => $unreadCount ]
+            ));
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function responses(Request $request) {
+
+     
+        try {
+            
+            $user = auth()->user();
+            $allResponses = $user->notifications()
+                ->where('type', NewResponse::class)
+                ->latest()
+                ->get();
+                
+            $totalUnread = $allResponses->whereNull('read_at')->count();
+            $groupedByUser = $allResponses
+                    ->filter(fn ($n) => isset($n->data['user_id']))
+                    ->groupBy(fn ($n) => $n->data['user_id']);
+
+            $final = $groupedByUser->map(function (Collection $group, $userId) {
+                $unreadCount = $group->whereNull('read_at')->count();
+                $notification = $group->whereNull('read_at')->first() ?? $group->first();
+                return [
+                    'user_id' => $userId,
+                    'notification' => [
+                        'id' => $notification->id,
+                        'message' => $notification->data['message'] ?? null,
+                        'user' => $notification->data['user'] ?? null,
+                        'response' => $notification->data['response'] ?? null,
+                        'read_at' => $notification->read_at,
+                        'created_at' => $notification->created_at,
+                    ],
+                    'unread_count' => $unreadCount,
+                ];
+
+            })->values();
+
+         return response()->json([
+                        'data' => $final], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function markAsRead(Request $request, $id, $ticket_id = null ) {
+        try {
+            $user = auth()->user();
+            $notification = $user->notifications()->where('id', $id)->first();
+    
+            if (!$notification) {
+                throw new ModelNotFoundException('Notification not found');
+            }
+            
+
+            if($notification->type == NewResponse::class) {
+                $targetUserId = $notification->data['user_id'];
+
+                $user->unreadNotifications()
+                ->where('type', NewResponse::class)
+                ->get()
+                ->filter(fn ($n) => $n->data['user_id'] == $targetUserId)
+                ->each->markAsRead();
+            }
+            
+            
+            $notification->markAsRead();
+            
+            return response()->json([
+                'message' => 'Notification marked as read',
+                'data' => new NotificationResource($notification)
+            ], 200);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        }catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

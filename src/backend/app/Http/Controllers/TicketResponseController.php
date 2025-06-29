@@ -11,7 +11,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use App\Services\TicketResponseService;
 
 use Spatie\Permission\Models\Role;
-
+use App\Notifications\NewResponse;
+use App\Models\Ticket;
 use Exception;
 
 class TicketResponseController extends Controller
@@ -52,8 +53,15 @@ class TicketResponseController extends Controller
                 $data['attachments'] = $request->file('attachments', []);
                 $data['uploaded_by'] = auth()->id();
 
-                $results = $this->ticketResponseService->createResponse($data);
+                $result = $this->ticketResponseService->createResponse($data);
 
+                $user = auth()->user(); 
+
+                $ticket = Ticket::findOrFail($result->ticket_id);
+                
+
+                $userToNotify = $ticket->assigned_user_id === $user->id ? $ticket->client : $ticket->assigneduser;
+                $userToNotify->notify(new NewResponse($result->load('user')));
                 return response()->json([
                     'success' => true,
                     ], 201);
