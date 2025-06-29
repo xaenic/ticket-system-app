@@ -33,7 +33,7 @@ if [ ! -f .env ]; then
     source .env
 fi
 
-docker compose down -v 
+docker compose down -v --remove-orphans
 
 if [ ! -f ./src/backend/.env ]; then
     print_step "Creating Laravel .env file..."
@@ -53,12 +53,12 @@ if [ ! -f ./src/frontend/.env ]; then
 fi
 
 
-# Build and start containers
 print_step "Building and starting Docker containers..."
-docker-compose up -d --build
+docker-compose build --no-cache
+docker-compose up -d
 
 print_status "Waiting for MySQL to be ready..."
-until docker-compose exec mysql mysqladmin ping -h"localhost" --silent; do
+until docker compose exec mysql mysqladmin ping -h"localhost" --silent; do
     print_status "Waiting for MySQL..."
     sleep 2
 done
@@ -68,30 +68,20 @@ print_status "MySQL is ready!"
 
 print_status "Waiting for Laravel container to be ready..."
 sleep 10
-# docker-compose exec laravel composer install --dev
 
-print_step "Generating Laravel application key..."
-docker-compose exec laravel php artisan key:generate --force
+docker compose exec laravel bash -c "composer install && php artisan key:generate && php artisan migrate:fresh --seed"
 
 
-
-print_step "Running database migrations..."
-docker-compose exec laravel php artisan migrate --force --no-interaction
-
-print_step "Running database seeders..."
-docker-compose exec laravel php artisan db:seed 
-
-
-docker-compose exec laravel php artisan passport:install --force --no-interaction
+docker compose exec laravel php artisan passport:install --force --no-interaction
 
 
 print_step "Setting up storage link"
-docker-compose exec laravel php artisan storage:link
+docker compose exec laravel php artisan storage:link
 
 
 print_step "Clearing and caching configuration..."
-docker-compose exec laravel php artisan config:clear
-docker-compose exec laravel php artisan config:cache
+docker compose exec laravel php artisan config:clear
+docker compose exec laravel php artisan config:cache
 
 print_step "Setup complete! Back-End application should be available at ${GREEN}http://localhost:8000${NC}"
 print_step "Setup complete! Front-End application should be available at ${GREEN}http://localhost:5173${NC}"
