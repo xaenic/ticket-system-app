@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Validations\TicketResponseValidation as TicketResponseRequest;
-
-use Illuminate\Auth\Access\AuthorizationException;
-
-use App\Services\TicketResponseService;
-
-use Spatie\Permission\Models\Role;
-use App\Notifications\NewResponse;
 use App\Models\Ticket;
+use App\Notifications\NewResponse;
+use App\Services\TicketResponseService;
+use App\Validations\TicketResponseValidation as TicketResponseRequest;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class TicketResponseController extends Controller
 {

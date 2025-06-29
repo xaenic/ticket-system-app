@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Validations\UserValidation as UserRequest;
-use App\Validations\ProfileValidation as ProfileRequest;
-use App\Validations\AssignmentDepartmentValidation as AssignmentRequest;
-use Illuminate\Support\Facades\Hash;
-
-use App\Services\UserService;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\PaginationResource;
 use App\Notifications\NewResponse;
-use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Role;
-
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-
+use App\Services\UserService;
+use App\Validations\AssignmentDepartmentValidation as AssignmentRequest;
+use App\Validations\ProfileValidation as ProfileRequest;
+use App\Validations\UserValidation as UserRequest;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {

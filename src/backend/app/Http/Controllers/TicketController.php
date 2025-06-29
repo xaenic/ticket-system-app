@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-use App\Validations\TicketValidation as TicketRequest;
-use App\Validations\StatusValidation as StatusRequest;
-
-use Exception;
-
-use App\Services\TicketService;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use App\Notifications\NewTicket;
 use App\Notifications\TicketUpdate;
+use App\Services\TicketService;
+use App\Validations\StatusValidation as StatusRequest;
+use App\Validations\TicketValidation as TicketRequest;
+use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class TicketController extends Controller
 {

@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Storage;
-use App\Models\Attachment;
-
-use Spatie\Permission\Models\Role;
-
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-
 use Exception;
+use App\Models\Attachment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Spatie\Permission\Models\Role;
 
 class AttachmentController extends Controller
 {

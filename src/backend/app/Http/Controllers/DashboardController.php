@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Validations\DepartmentValidation as DepartmentRequest;
-
 use App\Services\DepartmentService;
 use App\Services\TicketService;
 use App\Services\UserService;
+use App\Validations\DepartmentValidation as DepartmentRequest;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {

@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Validations\DepartmentValidation as DepartmentRequest;
-
 use App\Services\DepartmentService;
-
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
+use App\Validations\DepartmentValidation as DepartmentRequest;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 class DepartmentController extends Controller
 {
     protected $departmentService;
