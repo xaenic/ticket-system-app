@@ -31,11 +31,10 @@ export const addResponse = async ({
     }
     return true;
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
-      const msg = error.response.data.messages;
+    if (error instanceof AxiosError && error.response?.data) {
       const exception = error.response.data.message;
       if (exception) throw new Error(exception);
-      return msg;
+     throw error.response.data.messages;
     }
     throw new Error("Failed to add response");
   }
@@ -85,7 +84,7 @@ export const updateTicket = async ({
 
     return true;
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
+    if (error instanceof AxiosError && error.response?.data) {
       const msg = error.response.data.messages;
       const exception = error.response.data.message;
 

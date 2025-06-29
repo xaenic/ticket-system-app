@@ -47,10 +47,11 @@ export const ResponseInput = () => {
       setMessage("");
       setSelectedFiles([]);
     } catch (error) {
+        console.log(error)
           if (error instanceof Error) {
             toast.error(error.message);
           } else if (error instanceof Object) {
-            toast.error(error['message']);
+            toast.error((error as { message: string }).message);
           } else toast.error("Something went wrong");
         }
     setLoading(false);

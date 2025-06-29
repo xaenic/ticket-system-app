@@ -33,7 +33,6 @@ class TicketSeeder extends Seeder
                 'priority' => 'high',
                 'client_id' => $client->id,
                 'department_id' => $departments->where('name', 'Technical Support')->first()?->id,
-                'assigned_user_id' => $agents->where('department_id', $departments->where('name', 'Technical Support')->first()?->id)->first()?->id,
             ],
             [
                 'title' => 'Billing Discrepancy',
@@ -78,7 +77,6 @@ class TicketSeeder extends Seeder
                 'priority' => 'low',
                 'client_id' => $client->id,
                 'department_id' => $departments->where('name', 'Sales & Marketing')->first()?->id,
-                'assigned_user_id' => $agents->where('department_id', $departments->where('name', 'Sales & Marketing')->first()?->id)->first()?->id,
             ],
             [
                 'title' => 'Data Export Functionality',
@@ -96,7 +94,6 @@ class TicketSeeder extends Seeder
                 'priority' => 'high',
                 'client_id' => $client->id,
                 'department_id' => $departments->where('name', 'Quality Assurance')->first()?->id,
-                'assigned_user_id' => $agents->where('department_id', $departments->where('name', 'Quality Assurance')->first()?->id)->first()?->id,
             ],
         ];
 

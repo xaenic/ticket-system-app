@@ -60,7 +60,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 ">
         <RecentActivity
           recents={data?.recents || []}
           subtitle="Latest update from your works"

@@ -67,7 +67,7 @@ class TicketResponseSeeder extends Seeder
         }
 
         // Add some additional responses for active tickets
-        $activeTickets = Ticket::whereIn('status', ['open', 'in_progress'])->get();
+        $activeTickets = Ticket::whereIn('status', [ 'in_progress'])->get();
         
         foreach ($activeTickets as $ticket) {
             if ($ticket->assigneduser && rand(0, 1)) { // 50% chance of additional response

@@ -82,7 +82,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-6 ">
         <Card className="shadow-sm border border-slate-200/60 bg-white/50 backdrop-blur-sm shadow-none border-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100">
             <div className="flex items-center space-x-2">
