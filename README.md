@@ -107,6 +107,9 @@ cp .env.example .env
 
 # Copy backend environment file
 cp src/backend/.env.example src/backend/.env
+
+# Copy frontend environment file
+cp src/frontend/.env.example src/frontend/.env
 ```
 
 Edit the `.env` files with your preferred database credentials.
@@ -115,36 +118,34 @@ Edit the `.env` files with your preferred database credentials.
 
 ```bash
 # Build all containers
-docker-compose build
+docker compose build
 
 # Start services in detached mode
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 3. Backend Setup
 
 ```bash
 # Install PHP dependencies
-docker-compose exec laravel composer install
+docker compose exec laravel composer install
 
 # Generate application key
-docker-compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan key:generate
 
-# Generate JWT secret
-docker-compose exec laravel php artisan jwt:secret
+docker compose exec laravel php artisan passport:install --force --no-interaction
 
 # Run database migrations
-docker-compose exec laravel php artisan migrate
-
-# Seed the database (optional)
-docker-compose exec laravel php artisan db:seed
+docker compose exec laravel php artisan migrate:fres 
+# Seed the database (optional 
+docker compose exec laravel php artisan db:seed
 ```
 
 ### 4. Frontend Setup
 
 ```bash
 # Install Node.js dependencies
-docker-compose exec react npm install
+docker compose exec react npm install
 ```
 
 ## 🛠️ Development Commands
@@ -153,40 +154,37 @@ docker-compose exec react npm install
 
 ```bash
 # View running containers
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs [service_name]
+docker compose logs [service_name]
 
 # Stop all services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes
-docker-compose down -v
+docker compose down -v
 
 # Rebuild specific service
-docker-compose build [service_name]
+docker compose build [service_name]
 
 # Restart specific service
-docker-compose restart [service_name]
+docker compose restart [service_name]
 ```
 
 ### Backend (Laravel) Commands
 
 ```bash
 # Access Laravel container shell
-docker-compose exec laravel bash
-
-# Run Artisan commands
-docker-compose exec laravel php artisan [command]
-
-# Run tests
-docker-compose exec laravel php artisan test
-
-# Clear caches
-docker-compose exec laravel php artisan cache:clear
-docker-compose exec laravel php artisan config:clear
-docker-compose exec laravel php artisan route:clear
+docker compose exec laravel bash 
+# Run  rtisan commands
+docker compose exec laravel php artisan [command] 
+# Run  ests
+docker compose exec laravel php artisan test 
+# Clea  caches
+docker compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan config:clear
+docker compose exec laravel php artisan route:clear
 ```
 
 ### Frontend (React) Commands
@@ -209,13 +207,13 @@ docker-compose exec react npm run build
 
 ```bash
 # Access MySQL container
-docker-compose exec mysql mysql -u root -p
+docker compose exec mysql mysql -u root -p
 
 # Create database backup
-docker-compose exec mysql mysqldump -u root -p[password] [database_name] > backup.sql
+docker compose exec mysql mysqldump -u root -p[password] [database_name] > backup.sql
 
 # Restore database backup
-docker-compose exec -T mysql mysql -u root -p[password] [database_name] < backup.sql
+docker compose exec -T mysql mysql -u root -p[password] [database_name] < backup.sql
 ```
 
 ### Test Coverage
@@ -314,10 +312,10 @@ To completely reset your development environment:
 
 ```bash
 # Stop and remove all containers, networks, and volumes
-docker-compose down -v
+docker compose down -v
 
 # Remove Docker images (optional)
-docker-compose down --rmi all
+docker compose down --rmi all
 
 # Clean up Docker system (optional)
 docker system prune -a
