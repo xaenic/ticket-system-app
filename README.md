@@ -2,6 +2,17 @@
 
 A modern ticket management system built with React (TypeScript) frontend and Laravel (PHP) backend, containerized with Docker.
 
+## ✨ Key Features
+
+- **User Role Management**: Multiple user roles including admin, agent, and client 
+- **Ticket Creation & Tracking**: Create, assign, update, and track support tickets throughout their lifecycle
+- **Real-time Notifications**: Instant notifications for ticket updates and status changes powered by Pusher, Laravel Echo, and Soketi WebSockets
+- **Knowledge Base**: Searchable help center for common issues and self-service solutions
+- **Dashboard & Analytics**: Visual reporting and analytics of ticket metrics and team performance
+- **File Attachments**: Ability to attach files and screenshots to tickets for better context
+- **Comment System**: Threaded comments on tickets 
+- **Mobile Responsive**: Full functionality on mobile devices with responsive design
+
 ## 🏗️ Architecture
 
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
@@ -92,6 +103,15 @@ The application consists of three main services:
 - **Build Context**: Uses `./docker/mysql/Dockerfile`
 - **Volume Mounts**:
   - `mysql_data:/var/lib/mysql` (persistent data storage)
+  
+### Soketi WebSocket Service
+- **Container**: `ticket_soketi`
+- **Port**: 6001
+- **Image**: Uses `quay.io/soketi/soketi:latest`
+- **Environment**:
+  - Configured with the same Pusher credentials as in the application
+  - Enables debugging in development mode
+  - Default application details for seamless integration
 
 ## ⚙️ Manual Setup (Alternative)
 
@@ -270,6 +290,34 @@ Default ports can be modified in `docker-compose.yml`:
 - Laravel: `8000:8000`
 - MySQL: `3306:3306`
 
+### Real-time Communication Setup
+
+The application uses a powerful real-time communication stack:
+
+- **Pusher**: Cloud service for WebSockets communication
+- **Laravel Echo**: JavaScript library that makes subscribing to channels and listening for events easy
+- **Soketi**: Self-hosted, open-source WebSockets server compatible with the Pusher protocol
+
+Key environment variables for real-time communication (in `.env`):
+
+```env
+# WebSockets Configuration
+PUSHER_APP_ID=app-id
+PUSHER_APP_KEY=app-key
+PUSHER_APP_SECRET=app-secret
+PUSHER_HOST=soketi
+PUSHER_PORT=6001
+PUSHER_SCHEME=http
+PUSHER_APP_CLUSTER=mt1
+
+# Frontend Echo Configuration
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+```
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -304,6 +352,19 @@ Default ports can be modified in `docker-compose.yml`:
    
    # Rebuild React container
    docker-compose build react
+   ```
+
+5. **WebSocket connection issues**
+   ```bash
+   # Check Soketi container logs
+   docker-compose logs soketi
+   
+   # Verify environment variables are correctly set
+   docker-compose exec laravel cat .env | grep PUSHER
+   docker-compose exec react cat .env | grep VITE_PUSHER
+   
+   # Restart Soketi service
+   docker-compose restart soketi
    ```
 
 ### Resetting the Environment
