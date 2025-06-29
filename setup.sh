@@ -76,7 +76,7 @@ docker compose run --rm laravel php artisan passport:install --force --no-intera
 
 
 print_step "Setting up storage link"
-docker compose exec laravel php artisan storage:link
+docker compose run --rm  laravel php artisan storage:link
 
 
 print_step "Clearing and caching configuration..."
