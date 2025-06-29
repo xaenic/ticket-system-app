@@ -14,6 +14,7 @@ import { Button } from "../ui/button";
 export const AppSidebar = ({ items }: { items: IMenuItem[] }) => {
   const path = useLocation().pathname;
   const navigate = useNavigate();
+
   return (
     <Sidebar className="border-none ">
       <SidebarHeader className="p-6">

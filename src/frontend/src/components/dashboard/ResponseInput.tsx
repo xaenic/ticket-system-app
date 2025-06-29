@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { addResponse } from "@/services/ticket.response.service";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { markNotificationRead } from "@/services/notification.service";
 
 export const ResponseInput = () => {
   const { id } = useParams();
@@ -35,25 +36,36 @@ export const ResponseInput = () => {
     }
     setLoading(true);
     try {
+      const notif_id = queryClient.getQueryData(["notification_id"]) as
+        | { notif_id: string; ticket_id: string }
+        | undefined;
+      console.log(notif_id);
       await addResponse({
         message,
         attachments: selectedFiles,
         ticket_id: id || "",
       });
+      if (notif_id && notif_id.notif_id && notif_id.ticket_id === id)
+        await markNotificationRead(notif_id.notif_id as string);
       queryClient.invalidateQueries({
         queryKey: ["ticket", id],
         exact: false,
       });
+      queryClient.refetchQueries({
+        queryKey: ["messages"],
+        exact: false,
+      });
+
       setMessage("");
       setSelectedFiles([]);
     } catch (error) {
-        console.log(error)
-          if (error instanceof Error) {
-            toast.error(error.message);
-          } else if (error instanceof Object) {
-            toast.error((error as { message: string }).message);
-          } else toast.error("Something went wrong");
-        }
+      console.log(error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else if (error instanceof Object) {
+        toast.error((error as { message: string }).message);
+      } else toast.error("Something went wrong");
+    }
     setLoading(false);
   };
   return (
@@ -111,7 +123,7 @@ export const ResponseInput = () => {
           </span>
 
           <Button
-            disabled={loading }
+            disabled={loading}
             type="submit"
             className="px-4 py-2 hover:bg-blue-400 bg-blue-500 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >

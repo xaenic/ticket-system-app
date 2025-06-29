@@ -8,5 +8,6 @@ export interface IResponse<T> {
     per_page: number;
     to: number;
     total: number;
+    unread_count?: number; // Optional property for unread notifications count
 }
 

@@ -7,10 +7,10 @@ import { ProtectedRoute } from "./protection/ProtectedRoute";
 import { AdminRoutes, AgentRoutes, ClientRoutes } from "./PagesRoutes";
 import { Suspense } from "react";
 import { PageLoader } from "@/components/ui/pageLoader";
-import { AdminLayout } from "@/layouts/AdminLayout";
-import { ClientLayout } from "@/layouts/ClientLayout";
-import { AgentLayout } from "@/layouts/AgentLayout";
+
 import { Logout } from "@/pages/auth/Logout";
+import { MainLayout } from "@/layouts/MainLayout";
+import { adminData, agentData, clientData } from "./navdata";
 
 export default function AppRoutes() {
   return (
@@ -24,7 +24,7 @@ export default function AppRoutes() {
         </Route>
         <Route path="/logout" element={<Logout />} />
         <Route path="admin" element={<ProtectedRoute role="admin" />}>
-          <Route element={<AdminLayout />}>
+          <Route element={<MainLayout navData={adminData} />}>
             {AdminRoutes.map((route, index) => {
               const Page = route.component;
               return <Route key={index} path={route.path} element={<Page />} />;
@@ -32,7 +32,7 @@ export default function AppRoutes() {
           </Route>
         </Route>
         <Route path="client" element={<ProtectedRoute role="client" />}>
-          <Route element={<ClientLayout />}>
+          <Route element={<MainLayout navData={clientData} />}>
             {ClientRoutes.map((route, index) => {
               const Page = route.component;
               return <Route key={index} path={route.path} element={<Page />} />;
@@ -40,7 +40,7 @@ export default function AppRoutes() {
           </Route>
         </Route>
         <Route path="agent" element={<ProtectedRoute role="agent" />}>
-          <Route element={<AgentLayout />}>
+          <Route element={<MainLayout navData={agentData} />}>
             {AgentRoutes.map((route, index) => {
               const Page = route.component;
               return <Route key={index} path={route.path} element={<Page />} />;

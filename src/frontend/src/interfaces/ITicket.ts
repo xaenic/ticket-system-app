@@ -98,6 +98,7 @@ export type PaginationParams = {
   page?: number;
   perPage: number;
   query?: string;
+  status?:string;
 };
 
 // Type for user tickets with additional filters

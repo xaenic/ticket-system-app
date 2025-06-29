@@ -1,5 +1,5 @@
 export const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
+  switch (status?.toLowerCase()) {
     case "open":
       return "bg-blue-100 text-blue-700 border-blue-200";
     case "resolved":
@@ -16,7 +16,7 @@ export const getStatusColor = (status: string) => {
 };
 
 export const getPriorityColor = (priority: string) => {
-  switch (priority.toLowerCase()) {
+  switch (priority?.toLowerCase()) {
     case "low":
       return "bg-green-100 text-green-800 border-green-300";
     case "medium":

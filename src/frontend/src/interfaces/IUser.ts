@@ -8,6 +8,7 @@ export interface IUser {
   role?: string;
   department?: IDepartment
   avatar?:string;
+  department_id?: string;
 }
 
 

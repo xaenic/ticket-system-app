@@ -59,7 +59,6 @@ export const getOpenTickets = async ({
     return response.data;
   }catch (error) {
     if (error instanceof AxiosError && error.response?.data) {
-      // Handle validation errors from backend
       const exception = error.response.data?.message;
       if (exception) {
         throw new Error(exception);

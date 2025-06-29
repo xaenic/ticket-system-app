@@ -8,13 +8,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { Bell,LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BASE_API_URL } from "@/utils/api";
 import { SidebarTrigger } from "../ui/sidebar";
 import { getInitials } from "@/utils/helpers";
+import { Notification } from "../Notification";
+import { Messages } from "../Messages";
 
 export const TopBar = () => {
   const { user } = useAuth();
@@ -45,12 +47,8 @@ export const TopBar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell size={20} />
-          <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <Messages />
+        <Notification />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

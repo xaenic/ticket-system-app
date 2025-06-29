@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BASE_API_URL } from "@/utils/api";
 import { getInitials } from "@/utils/helpers";
 
+
 const Dashboard = () => {
   const { user } = useAuth();
 
@@ -81,7 +82,6 @@ const Dashboard = () => {
           />
         ))}
       </div>
-
       <div className="grid gap-6 ">
         <Card className="shadow-sm border border-slate-200/60 bg-white/50 backdrop-blur-sm shadow-none border-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100">

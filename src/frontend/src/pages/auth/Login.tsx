@@ -18,7 +18,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,7 +29,6 @@ import { useState } from "react";
 export function Login() {
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -44,7 +43,7 @@ export function Login() {
     try {
       await login(email, password);
       toast.success("Login successful!");
-      navigate("/dashboard", { replace: true });
+      window.location.href = "/";
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
