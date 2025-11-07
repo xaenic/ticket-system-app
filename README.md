@@ -2,6 +2,8 @@
 
 A modern ticket management system built with React (TypeScript) frontend and Laravel (PHP) backend, containerized with Docker.
 
+<img width="1907" height="907" alt="image" src="https://github.com/user-attachments/assets/0e0a2f54-3ffa-45e7-be6e-f9f46a07d443" />
+
 ## ✨ Key Features
 
 - **User Role Management**: Multiple user roles including admin, agent, and client 
