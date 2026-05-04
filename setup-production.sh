@@ -375,8 +375,9 @@ configure_production_env() {
     soketi_key=${SOKETI_DEFAULT_KEY:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_KEY)}
     soketi_secret=${SOKETI_DEFAULT_SECRET:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_SECRET)}
     soketi_port=${SOKETI_PORT:-$(env_value "$ROOT_DIR/.env" SOKETI_PORT)}
-    pusher_host=${PUSHER_HOST:-$(env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST)}
-    pusher_scheme=${PUSHER_SCHEME:-https}
+    pusher_host=${PUSHER_HOST:-127.0.0.1}
+    pusher_port=${PUSHER_PORT:-}
+    pusher_scheme=${PUSHER_SCHEME:-http}
     pusher_tls=${VITE_PUSHER_TLS:-true}
     websocket_url=${VITE_WEBSOCKET_URL:-${WEBSOCKET_URL:-}}
 
@@ -384,19 +385,19 @@ configure_production_env() {
     soketi_key=${soketi_key:-app-key}
     soketi_secret=${soketi_secret:-app-secret}
     soketi_port=${soketi_port:-6001}
-    pusher_host=${pusher_host:-soketi.xaenic.dev}
+    pusher_port=${pusher_port:-$soketi_port}
     if [ -z "$websocket_url" ]; then
-        if [ "$pusher_tls" = "true" ] || [ "$pusher_scheme" = "https" ]; then
-            websocket_url="wss://${pusher_host}"
-        else
-            websocket_url="ws://${pusher_host}:${soketi_port}"
-        fi
+        websocket_url="wss://soketi.xaenic.dev"
     fi
     websocket_url=$(prompt_value "Frontend websocket URL" "$websocket_url")
-    pusher_host=$(url_host "$websocket_url")
-    pusher_scheme=$(url_scheme "$websocket_url")
-    pusher_port=$(url_port "$websocket_url")
-    soketi_port=$pusher_port
+    frontend_pusher_host=$(url_host "$websocket_url")
+    frontend_pusher_port=$(url_port "$websocket_url")
+    frontend_pusher_scheme=$(url_scheme "$websocket_url")
+    if [ "$frontend_pusher_scheme" = "https" ]; then
+        pusher_tls=true
+    else
+        pusher_tls=false
+    fi
 
     set_env_value "$BACKEND_DIR/.env" APP_ENV production
     set_env_value "$BACKEND_DIR/.env" APP_DEBUG false
@@ -420,8 +421,8 @@ configure_production_env() {
 
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_APP_KEY "$soketi_key"
     set_env_value "$FRONTEND_DIR/.env" VITE_API_BASE_URL "$api_url"
-    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST "$pusher_host"
-    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_PORT "$soketi_port"
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST "$frontend_pusher_host"
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_PORT "$frontend_pusher_port"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_TLS "$pusher_tls"
     set_env_value "$FRONTEND_DIR/.env" VITE_WEBSOCKET_URL "$websocket_url"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_AUTH_ENDPOINT "${VITE_PUSHER_AUTH_ENDPOINT:-/broadcasting/auth}"
