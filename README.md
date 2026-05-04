@@ -93,7 +93,7 @@ The script will ask for the frontend websocket URL. Press Enter to use the defau
 For a real public server, override the defaults:
 
 ```bash
-APP_URL=https://example.com VITE_WEBSOCKET_URL=wss://ws.example.com ./setup-production.sh
+APP_URL=https://example.com ./setup-production.sh
 ```
 
 The production script installs Composer dependencies without dev packages, runs migrations, creates Passport keys and clients if missing, caches Laravel config/views/events, builds frontend assets, and publishes the frontend into Laravel `public/` so Laravel and React are served from one app port. It does not run seeders unless `RUN_SEEDERS=1` is set.
@@ -120,7 +120,7 @@ You can also run services individually:
 ./start-soketi.sh
 ```
 
-For a public deployment, set `VITE_WEBSOCKET_URL` to the browser-facing websocket URL, for example `wss://ws.example.com`. The older split variables `PUSHER_HOST`, `PUSHER_SCHEME`, and `VITE_PUSHER_TLS` still work as fallback.
+The default browser-facing websocket URL is `wss://soketi.xaenic.dev`. Override `VITE_WEBSOCKET_URL` only if you move realtime to another hostname.
 
 ### 5. Default Login Credentials
 

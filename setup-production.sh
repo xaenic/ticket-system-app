@@ -361,18 +361,18 @@ configure_production_env() {
     soketi_secret=${SOKETI_DEFAULT_SECRET:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_SECRET)}
     soketi_port=${SOKETI_PORT:-$(env_value "$ROOT_DIR/.env" SOKETI_PORT)}
     pusher_host=${PUSHER_HOST:-$(env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST)}
-    pusher_scheme=${PUSHER_SCHEME:-http}
-    pusher_tls=${VITE_PUSHER_TLS:-false}
+    pusher_scheme=${PUSHER_SCHEME:-https}
+    pusher_tls=${VITE_PUSHER_TLS:-true}
     websocket_url=${VITE_WEBSOCKET_URL:-${WEBSOCKET_URL:-}}
 
     soketi_app_id=${soketi_app_id:-app-id}
     soketi_key=${soketi_key:-app-key}
     soketi_secret=${soketi_secret:-app-secret}
     soketi_port=${soketi_port:-6001}
-    pusher_host=${pusher_host:-localhost}
+    pusher_host=${pusher_host:-soketi.xaenic.dev}
     if [ -z "$websocket_url" ]; then
         if [ "$pusher_tls" = "true" ] || [ "$pusher_scheme" = "https" ]; then
-            websocket_url="wss://${pusher_host}:${soketi_port}"
+            websocket_url="wss://${pusher_host}"
         else
             websocket_url="ws://${pusher_host}:${soketi_port}"
         fi

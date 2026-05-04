@@ -14,7 +14,7 @@ declare global {
 window.Pusher = Pusher;
 
 const token = localStorage.getItem('token');
-const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
+const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL || 'wss://soketi.xaenic.dev';
 let websocketConfig = {
   host: import.meta.env.VITE_PUSHER_HOST || window.location.hostname,
   port: parseInt(import.meta.env.VITE_PUSHER_PORT) || 6001,
