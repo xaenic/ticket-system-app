@@ -87,6 +87,21 @@ prompt_value() {
     fi
 }
 
+url_host() {
+    url=$1
+    php -r '$url = $argv[1]; echo parse_url($url, PHP_URL_HOST) ?: "";' "$url"
+}
+
+url_scheme() {
+    url=$1
+    php -r '$url = $argv[1]; $scheme = parse_url($url, PHP_URL_SCHEME) ?: ""; echo $scheme === "wss" ? "https" : ($scheme === "ws" ? "http" : $scheme);' "$url"
+}
+
+url_port() {
+    url=$1
+    php -r '$url = $argv[1]; $port = parse_url($url, PHP_URL_PORT); if ($port) { echo $port; exit; } $scheme = parse_url($url, PHP_URL_SCHEME); echo in_array($scheme, ["https", "wss"], true) ? "443" : "80";' "$url"
+}
+
 composer_install_flags() {
     if php -r 'exit(PHP_VERSION_ID >= 80500 ? 0 : 1);' >/dev/null 2>&1; then
         printf '%s\n' "--ignore-platform-req=php"
@@ -378,6 +393,10 @@ configure_production_env() {
         fi
     fi
     websocket_url=$(prompt_value "Frontend websocket URL" "$websocket_url")
+    pusher_host=$(url_host "$websocket_url")
+    pusher_scheme=$(url_scheme "$websocket_url")
+    pusher_port=$(url_port "$websocket_url")
+    soketi_port=$pusher_port
 
     set_env_value "$BACKEND_DIR/.env" APP_ENV production
     set_env_value "$BACKEND_DIR/.env" APP_DEBUG false
@@ -395,7 +414,7 @@ configure_production_env() {
     set_env_value "$BACKEND_DIR/.env" PUSHER_APP_KEY "$soketi_key"
     set_env_value "$BACKEND_DIR/.env" PUSHER_APP_SECRET "$soketi_secret"
     set_env_value "$BACKEND_DIR/.env" PUSHER_HOST "$pusher_host"
-    set_env_value "$BACKEND_DIR/.env" PUSHER_PORT "$soketi_port"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_PORT "$pusher_port"
     set_env_value "$BACKEND_DIR/.env" PUSHER_SCHEME "$pusher_scheme"
     set_env_value "$BACKEND_DIR/.env" PUSHER_APP_CLUSTER "${PUSHER_APP_CLUSTER:-mt1}"
 
