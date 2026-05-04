@@ -374,7 +374,7 @@ configure_production_env() {
     soketi_app_id=${SOKETI_DEFAULT_APP_ID:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_APP_ID)}
     soketi_key=${SOKETI_DEFAULT_KEY:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_KEY)}
     soketi_secret=${SOKETI_DEFAULT_SECRET:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_SECRET)}
-    soketi_port=${SOKETI_PORT:-$(env_value "$ROOT_DIR/.env" SOKETI_PORT)}
+    soketi_port=${SOKETI_PORT:-6001}
     pusher_host=${PUSHER_HOST:-127.0.0.1}
     pusher_port=${PUSHER_PORT:-}
     pusher_scheme=${PUSHER_SCHEME:-http}
