@@ -354,7 +354,7 @@ prepare_run_scripts() {
 configure_production_env() {
     app_url=${APP_URL:-$(env_value "$BACKEND_DIR/.env" APP_URL)}
     app_url=${app_url:-http://localhost:8000}
-    api_url=${VITE_API_BASE_URL:-${app_url%/}/api}
+    api_url=${VITE_API_BASE_URL:-/api}
     frontend_url=${FRONTEND_URL:-http://localhost}
     soketi_app_id=${SOKETI_DEFAULT_APP_ID:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_APP_ID)}
     soketi_key=${SOKETI_DEFAULT_KEY:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_KEY)}
@@ -405,7 +405,7 @@ configure_production_env() {
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_PORT "$soketi_port"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_TLS "$pusher_tls"
     set_env_value "$FRONTEND_DIR/.env" VITE_WEBSOCKET_URL "$websocket_url"
-    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_AUTH_ENDPOINT "${api_url%/api}/broadcasting/auth"
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_AUTH_ENDPOINT "${VITE_PUSHER_AUTH_ENDPOINT:-/broadcasting/auth}"
     set_env_value "$FRONTEND_DIR/.env" VITE_APP_URL "$frontend_url"
 
     set_env_value "$ROOT_DIR/.env" DB_DATABASE "${DB_DATABASE:-$(env_value "$ROOT_DIR/.env" DB_DATABASE)}"

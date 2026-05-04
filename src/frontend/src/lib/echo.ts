@@ -40,7 +40,7 @@ const echo = new Echo({
   forceTLS: websocketConfig.tls,
   disableStats: true, 
   enabledTransports: websocketConfig.tls ? ['wss'] : ['ws'],
-  authEndpoint: import.meta.env.VITE_PUSHER_AUTH_ENDPOINT || 'http://localhost:8000/broadcasting/auth',
+  authEndpoint: import.meta.env.VITE_PUSHER_AUTH_ENDPOINT || '/broadcasting/auth',
   auth: {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
