@@ -1,6 +1,6 @@
 # Ticket System Application
 
-A modern ticket management system built with React (TypeScript) frontend and Laravel (PHP) backend, containerized with Docker.
+A modern ticket management system built with React (TypeScript) frontend and Laravel (PHP) backend.
 
 <img width="1907" height="907" alt="image" src="https://github.com/user-attachments/assets/0e0a2f54-3ffa-45e7-be6e-f9f46a07d443" />
 
@@ -20,15 +20,19 @@ A modern ticket management system built with React (TypeScript) frontend and Lar
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Laravel 10 + PHP 8.1
 - **Database**: MySQL 8.0
-- **Containerization**: Docker & Docker Compose
+- **Local development**: Shell setup script for Termux, proot, and Linux environments without Docker
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
 
-- [Docker](https://docs.docker.com/get-docker/) (version 20.10 or higher)
-- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0 or higher)
 - [Git](https://git-scm.com/downloads)
+- PHP 8.1 or higher
+- Composer
+- Node.js and npm
+- MariaDB or MySQL
+
+On Termux, `setup.sh` can install these with `pkg`. On Debian/Ubuntu proot environments, it can install them with `apt`.
 
 ## 🚀 Quick Start
 
@@ -51,14 +55,22 @@ chmod +x setup.sh
 This script will:
 - Create necessary environment files
 - Install dependencies
-- Set up the database
+- Start and set up a local MariaDB/MySQL database
 - Generate application keys
 - Configure permissions
 
 ### 3. Start the Application
 
+Run the backend and frontend in separate terminals:
+
 ```bash
-docker-compose up -d
+cd src/backend
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+```bash
+cd src/frontend
+npm run dev -- --host 0.0.0.0
 ```
 
 ### 4. Access the Application
@@ -386,4 +398,3 @@ docker system prune -a
 # Restart setup
 ./setup.sh
 ```
-
