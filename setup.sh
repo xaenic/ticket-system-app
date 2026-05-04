@@ -4,6 +4,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 BACKEND_DIR="$ROOT_DIR/src/backend"
 FRONTEND_DIR="$ROOT_DIR/src/frontend"
+TMP_BASE="${TMPDIR:-${PREFIX:-/tmp}/tmp}"
 
 if [ -t 1 ]; then
     RED=$(printf '\033[0;31m')
@@ -41,7 +42,7 @@ package_install() {
     if is_termux && have pkg; then
         step "Installing required packages with Termux pkg..."
         pkg update
-        pkg install -y git nodejs php composer mariadb
+        pkg install -y git nodejs php php-sodium composer mariadb
         return 0
     fi
 
@@ -65,6 +66,12 @@ require_command() {
         error "Missing required command: $1"
         error "Install the missing dependency, then run ./setup.sh again."
         exit 1
+    fi
+}
+
+composer_install_flags() {
+    if php -r 'exit(PHP_VERSION_ID >= 80500 ? 0 : 1);' >/dev/null 2>&1; then
+        printf '%s\n' "--ignore-platform-req=php"
     fi
 }
 
@@ -128,6 +135,8 @@ start_database() {
     if is_termux; then
         step "Starting MariaDB for Termux..."
         data_dir="${PREFIX:-/data/data/com.termux/files/usr}/var/lib/mysql"
+        run_dir="${PREFIX:-/data/data/com.termux/files/usr}/var/run"
+        mkdir -p "$run_dir" "$TMP_BASE"
         if [ ! -d "$data_dir/mysql" ]; then
             if have mariadb-install-db; then
                 mariadb-install-db --datadir="$data_dir" >/dev/null
@@ -135,10 +144,12 @@ start_database() {
                 mysql_install_db --datadir="$data_dir" >/dev/null
             fi
         fi
-        if have mariadbd-safe; then
-            nohup mariadbd-safe --datadir="$data_dir" >/tmp/ticket-system-mariadb.log 2>&1 &
+        if have setsid; then
+            setsid mariadbd --datadir="$data_dir" --socket="$run_dir/mysqld.sock" --pid-file="$run_dir/mysqld.pid" --port=3306 >"$TMP_BASE/ticket-system-mariadb.log" 2>&1 < /dev/null &
+        elif have mariadbd-safe; then
+            nohup mariadbd-safe --datadir="$data_dir" >"$TMP_BASE/ticket-system-mariadb.log" 2>&1 < /dev/null &
         else
-            nohup mysqld_safe --datadir="$data_dir" >/tmp/ticket-system-mariadb.log 2>&1 &
+            nohup mysqld_safe --datadir="$data_dir" >"$TMP_BASE/ticket-system-mariadb.log" 2>&1 < /dev/null &
         fi
     elif have systemctl; then
         step "Starting MariaDB/MySQL with systemctl..."
@@ -223,6 +234,72 @@ FLUSH PRIVILEGES;"
     printf '%s\n' "$sql" | mysql_cmd $root_args
 }
 
+db_count() {
+    table=$1
+    db_name=$(env_value "$BACKEND_DIR/.env" DB_DATABASE)
+    db_user=$(env_value "$BACKEND_DIR/.env" DB_USERNAME)
+    db_pass=$(env_value "$BACKEND_DIR/.env" DB_PASSWORD)
+
+    mysql_cmd -h127.0.0.1 -u"$db_user" "-p${db_pass}" "$db_name" -Nse "SELECT COUNT(*) FROM \`${table}\`;" 2>/dev/null || printf '%s\n' 0
+}
+
+ensure_passport_keys() {
+    if [ -f "$BACKEND_DIR/storage/oauth-private.key" ] && [ -f "$BACKEND_DIR/storage/oauth-public.key" ]; then
+        return 0
+    fi
+
+    step "Generating Passport keys with PHP OpenSSL..."
+    (cd "$BACKEND_DIR" && php <<'PHP'
+<?php
+$key = openssl_pkey_new([
+    'private_key_bits' => 4096,
+    'private_key_type' => OPENSSL_KEYTYPE_RSA,
+]);
+
+if (! $key) {
+    fwrite(STDERR, "Unable to create Passport keypair.\n");
+    exit(1);
+}
+
+openssl_pkey_export($key, $privateKey);
+$details = openssl_pkey_get_details($key);
+
+file_put_contents('storage/oauth-private.key', $privateKey);
+file_put_contents('storage/oauth-public.key', $details['key']);
+chmod('storage/oauth-private.key', 0600);
+chmod('storage/oauth-public.key', 0600);
+PHP
+)
+}
+
+ensure_passport_clients() {
+    personal_count=$(db_count oauth_personal_access_clients)
+    password_count=$(mysql_cmd -h127.0.0.1 -u"$(env_value "$BACKEND_DIR/.env" DB_USERNAME)" "-p$(env_value "$BACKEND_DIR/.env" DB_PASSWORD)" "$(env_value "$BACKEND_DIR/.env" DB_DATABASE)" -Nse "SELECT COUNT(*) FROM oauth_clients WHERE password_client = 1;" 2>/dev/null || printf '%s\n' 0)
+
+    if [ "$personal_count" = "0" ]; then
+        step "Creating Passport personal access client..."
+        (cd "$BACKEND_DIR" && php artisan passport:client --personal --name="Ticket System Personal Access Client")
+    fi
+
+    if [ "$password_count" = "0" ]; then
+        step "Creating Passport password grant client..."
+        (cd "$BACKEND_DIR" && php artisan passport:client --password --name="Ticket System Password Grant Client" --provider=users)
+    fi
+}
+
+link_lightningcss_wasm() {
+    lightning_dir="$FRONTEND_DIR/node_modules/lightningcss"
+    wasm_dir="$FRONTEND_DIR/node_modules/lightningcss-wasm"
+
+    if [ -d "$lightning_dir" ] && [ -d "$wasm_dir" ] && [ ! -f "$lightning_dir/pkg/index.js" ]; then
+        step "Linking lightningcss wasm fallback for Termux..."
+        rm -rf "$lightning_dir/pkg"
+        mkdir -p "$lightning_dir/pkg"
+        printf '%s\n' '{"main":"index.js"}' > "$lightning_dir/pkg/package.json"
+        printf '%s\n' "module.exports = require('lightningcss-wasm');" > "$lightning_dir/pkg/index.js"
+    fi
+}
+
 main() {
     cd "$ROOT_DIR"
 
@@ -252,17 +329,29 @@ main() {
     setup_database
 
     step "Installing Laravel dependencies..."
-    (cd "$BACKEND_DIR" && composer install)
+    composer_flags=$(composer_install_flags)
+    if [ -n "$composer_flags" ]; then
+        warn "PHP $(php -r 'echo PHP_VERSION;') is newer than this lockfile supports; using Composer flag: $composer_flags"
+    fi
+    # shellcheck disable=SC2086
+    (cd "$BACKEND_DIR" && composer install $composer_flags)
 
     step "Preparing Laravel application..."
     (cd "$BACKEND_DIR" && php artisan key:generate --force)
-    (cd "$BACKEND_DIR" && php artisan storage:link || true)
-    (cd "$BACKEND_DIR" && php artisan passport:install --force --no-interaction || true)
-    (cd "$BACKEND_DIR" && php artisan migrate --seed --force)
+    (cd "$BACKEND_DIR" && php artisan storage:link --force || true)
+    (cd "$BACKEND_DIR" && php artisan migrate --force)
+    if [ "$(db_count users)" = "0" ]; then
+        (cd "$BACKEND_DIR" && php artisan db:seed --force)
+    else
+        info "Database already has users; skipping seeders."
+    fi
+    ensure_passport_keys
+    ensure_passport_clients
     (cd "$BACKEND_DIR" && php artisan config:clear && php artisan route:clear && php artisan cache:clear)
 
     step "Installing frontend dependencies..."
     (cd "$FRONTEND_DIR" && npm install)
+    link_lightningcss_wasm
 
     info "Setup complete."
     printf '\nRun the app in separate terminals:\n'

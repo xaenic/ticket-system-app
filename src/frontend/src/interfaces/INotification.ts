@@ -1,4 +1,3 @@
-import type { IResponse } from "./IResponse";
 import type { IUser } from "./IUser";
 
 export interface INTicket {
