@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/{any?}', function () {
+    $frontend = public_path('frontend-index.html');
+
+    if (file_exists($frontend)) {
+        return response()->file($frontend);
+    }
+
     return view('welcome');
-});
+})->where('any', '^(?!api|oauth|broadcasting).*$');

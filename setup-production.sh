@@ -294,6 +294,21 @@ link_lightningcss_wasm() {
     fi
 }
 
+publish_frontend_to_laravel() {
+    step "Publishing frontend build into Laravel public directory..."
+    if [ ! -f "$FRONTEND_DIR/dist/index.html" ]; then
+        error "Frontend build not found at $FRONTEND_DIR/dist/index.html"
+        exit 1
+    fi
+
+    rm -rf "$BACKEND_DIR/public/assets"
+    cp -R "$FRONTEND_DIR/dist/assets" "$BACKEND_DIR/public/assets"
+    cp "$FRONTEND_DIR/dist/index.html" "$BACKEND_DIR/public/frontend-index.html"
+    if [ -f "$FRONTEND_DIR/dist/favicon.ico" ]; then
+        cp "$FRONTEND_DIR/dist/favicon.ico" "$BACKEND_DIR/public/favicon.ico"
+    fi
+}
+
 install_soketi() {
     if [ "${INSTALL_SOKETI:-1}" = "0" ]; then
         warn "Skipping Soketi install because INSTALL_SOKETI=0."
@@ -447,10 +462,10 @@ main() {
     (cd "$FRONTEND_DIR" && npm ci)
     link_lightningcss_wasm
     (cd "$FRONTEND_DIR" && npm run build)
+    publish_frontend_to_laravel
 
     info "Production setup complete."
-    printf '\nServe Laravel from: %s/public\n' "$BACKEND_DIR"
-    printf 'Serve frontend static files from: %s/dist\n' "$FRONTEND_DIR"
+    printf '\nServe Laravel and frontend from one port: %s/public\n' "$BACKEND_DIR"
     printf 'Start realtime websocket server with: %s/start-soketi.sh\n' "$ROOT_DIR"
     printf 'Use a process manager or web server for PHP/Laravel in production; php artisan serve is not recommended for public production traffic.\n'
 }

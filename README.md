@@ -94,7 +94,7 @@ For a real public server, override the defaults:
 APP_URL=https://api.example.com FRONTEND_URL=https://example.com PUSHER_HOST=ws.example.com PUSHER_SCHEME=https VITE_PUSHER_TLS=true ./setup-production.sh
 ```
 
-The production script installs Composer dependencies without dev packages, runs migrations, creates Passport keys and clients if missing, caches Laravel config/views/events, and builds frontend assets into `src/frontend/dist`. It does not run seeders unless `RUN_SEEDERS=1` is set.
+The production script installs Composer dependencies without dev packages, runs migrations, creates Passport keys and clients if missing, caches Laravel config/views/events, builds frontend assets, and publishes the frontend into Laravel `public/` so Laravel and React are served from one app port. It does not run seeders unless `RUN_SEEDERS=1` is set.
 
 It also installs Soketi for realtime websockets under `.runtime/soketi` and writes `start-soketi.sh`. Start the websocket server with:
 
@@ -113,7 +113,6 @@ You can also run services individually:
 
 ```bash
 ./start-backend-production.sh
-./start-frontend-production.sh
 ./start-soketi.sh
 ```
 

@@ -32,10 +32,8 @@ start_service() {
 
 start_service soketi "$ROOT_DIR/start-soketi.sh"
 start_service backend "$ROOT_DIR/start-backend-production.sh"
-start_service frontend "$ROOT_DIR/start-frontend-production.sh"
 
 echo
 echo "Production processes started."
-echo "Backend:  http://localhost:${BACKEND_PORT:-8000}"
-echo "Frontend: http://localhost:${FRONTEND_PORT:-5173}"
-echo "Soketi:   ws://localhost:${SOKETI_PORT:-6001}"
+echo "App:    http://localhost:${BACKEND_PORT:-8000}"
+echo "Soketi: ws://localhost:${SOKETI_PORT:-6001}"
