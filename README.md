@@ -79,6 +79,23 @@ npm run dev -- --host 0.0.0.0
 - **Backend API (Laravel)**: http://localhost:8000
 - **Database**: localhost:3306
 
+## Production Setup Without Docker
+
+Use `setup-production.sh` for a production-style install on Termux, proot, or Linux:
+
+```bash
+chmod +x setup-production.sh
+APP_URL=https://api.example.com \
+FRONTEND_URL=https://example.com \
+DB_DATABASE=ticket_system \
+DB_USERNAME=ticket_user \
+DB_PASSWORD='change-this-password' \
+DB_ROOTPASSWORD='your-db-root-password' \
+./setup-production.sh
+```
+
+The production script installs Composer dependencies without dev packages, runs migrations, creates Passport keys and clients if missing, caches Laravel config/views/events, and builds frontend assets into `src/frontend/dist`. It does not run seeders unless `RUN_SEEDERS=1` is set.
+
 ### 5. Default Login Credentials
 
 The application comes with pre-configured user accounts for testing:
