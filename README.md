@@ -81,20 +81,43 @@ npm run dev -- --host 0.0.0.0
 
 ## Production Setup Without Docker
 
-Use `setup-production.sh` for a production-style install on Termux, proot, or Linux:
+Use `setup-production.sh` for a production-style install on Termux, proot, or Linux. It includes default env values, so you can run it directly:
 
 ```bash
 chmod +x setup-production.sh
-APP_URL=https://api.example.com \
-FRONTEND_URL=https://example.com \
-DB_DATABASE=ticket_system \
-DB_USERNAME=ticket_user \
-DB_PASSWORD='change-this-password' \
-DB_ROOTPASSWORD='your-db-root-password' \
 ./setup-production.sh
 ```
 
+For a real public server, override the defaults:
+
+```bash
+APP_URL=https://api.example.com FRONTEND_URL=https://example.com PUSHER_HOST=ws.example.com PUSHER_SCHEME=https VITE_PUSHER_TLS=true ./setup-production.sh
+```
+
 The production script installs Composer dependencies without dev packages, runs migrations, creates Passport keys and clients if missing, caches Laravel config/views/events, and builds frontend assets into `src/frontend/dist`. It does not run seeders unless `RUN_SEEDERS=1` is set.
+
+It also installs Soketi for realtime websockets under `.runtime/soketi` and writes `start-soketi.sh`. Start the websocket server with:
+
+```bash
+./start-soketi.sh
+```
+
+Production run scripts are included:
+
+```bash
+./start-production.sh
+./stop-production.sh
+```
+
+You can also run services individually:
+
+```bash
+./start-backend-production.sh
+./start-frontend-production.sh
+./start-soketi.sh
+```
+
+For a public deployment, point `PUSHER_HOST` at the websocket hostname and set `PUSHER_SCHEME=https` plus `VITE_PUSHER_TLS=true` when Soketi is behind TLS.
 
 ### 5. Default Login Credentials
 

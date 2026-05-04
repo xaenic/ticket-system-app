@@ -4,6 +4,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 BACKEND_DIR="$ROOT_DIR/src/backend"
 FRONTEND_DIR="$ROOT_DIR/src/frontend"
+SOKETI_DIR="$ROOT_DIR/.runtime/soketi"
 TMP_BASE="${TMPDIR:-${PREFIX:-/tmp}/tmp}"
 
 if [ -t 1 ]; then
@@ -293,17 +294,53 @@ link_lightningcss_wasm() {
     fi
 }
 
+install_soketi() {
+    if [ "${INSTALL_SOKETI:-1}" = "0" ]; then
+        warn "Skipping Soketi install because INSTALL_SOKETI=0."
+        return 0
+    fi
+
+    step "Installing Soketi for realtime websockets..."
+    mkdir -p "$SOKETI_DIR"
+    npm install --prefix "$SOKETI_DIR" @soketi/soketi
+}
+
+write_soketi_launcher() {
+    step "Preparing Soketi launcher..."
+    chmod +x "$ROOT_DIR/start-soketi.sh"
+}
+
+prepare_run_scripts() {
+    chmod +x "$ROOT_DIR/start-production.sh"
+    chmod +x "$ROOT_DIR/stop-production.sh"
+    chmod +x "$ROOT_DIR/start-backend-production.sh"
+    chmod +x "$ROOT_DIR/start-frontend-production.sh"
+    chmod +x "$ROOT_DIR/start-soketi.sh"
+}
+
 configure_production_env() {
     app_url=${APP_URL:-$(env_value "$BACKEND_DIR/.env" APP_URL)}
     app_url=${app_url:-http://localhost:8000}
     api_url=${VITE_API_BASE_URL:-${app_url%/}/api}
     frontend_url=${FRONTEND_URL:-http://localhost}
+    soketi_app_id=${SOKETI_DEFAULT_APP_ID:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_APP_ID)}
+    soketi_key=${SOKETI_DEFAULT_KEY:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_KEY)}
+    soketi_secret=${SOKETI_DEFAULT_SECRET:-$(env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_SECRET)}
+    soketi_port=${SOKETI_PORT:-$(env_value "$ROOT_DIR/.env" SOKETI_PORT)}
     pusher_host=${PUSHER_HOST:-$(env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST)}
+    pusher_scheme=${PUSHER_SCHEME:-http}
+    pusher_tls=${VITE_PUSHER_TLS:-false}
+
+    soketi_app_id=${soketi_app_id:-app-id}
+    soketi_key=${soketi_key:-app-key}
+    soketi_secret=${soketi_secret:-app-secret}
+    soketi_port=${soketi_port:-6001}
     pusher_host=${pusher_host:-localhost}
 
     set_env_value "$BACKEND_DIR/.env" APP_ENV production
     set_env_value "$BACKEND_DIR/.env" APP_DEBUG false
     set_env_value "$BACKEND_DIR/.env" APP_URL "$app_url"
+    set_env_value "$BACKEND_DIR/.env" BROADCAST_DRIVER pusher
     set_env_value "$BACKEND_DIR/.env" DB_HOST "${DB_HOST:-127.0.0.1}"
     set_env_value "$BACKEND_DIR/.env" DB_DATABASE "${DB_DATABASE:-$(env_value "$BACKEND_DIR/.env" DB_DATABASE)}"
     set_env_value "$BACKEND_DIR/.env" DB_USERNAME "${DB_USERNAME:-$(env_value "$BACKEND_DIR/.env" DB_USERNAME)}"
@@ -312,10 +349,19 @@ configure_production_env() {
     set_env_value "$BACKEND_DIR/.env" CACHE_DRIVER "${CACHE_DRIVER:-file}"
     set_env_value "$BACKEND_DIR/.env" QUEUE_CONNECTION "${QUEUE_CONNECTION:-sync}"
     set_env_value "$BACKEND_DIR/.env" SESSION_DRIVER "${SESSION_DRIVER:-file}"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_APP_ID "$soketi_app_id"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_APP_KEY "$soketi_key"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_APP_SECRET "$soketi_secret"
     set_env_value "$BACKEND_DIR/.env" PUSHER_HOST "$pusher_host"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_PORT "$soketi_port"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_SCHEME "$pusher_scheme"
+    set_env_value "$BACKEND_DIR/.env" PUSHER_APP_CLUSTER "${PUSHER_APP_CLUSTER:-mt1}"
 
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_APP_KEY "$soketi_key"
     set_env_value "$FRONTEND_DIR/.env" VITE_API_BASE_URL "$api_url"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST "$pusher_host"
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_PORT "$soketi_port"
+    set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_TLS "$pusher_tls"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_AUTH_ENDPOINT "${api_url%/api}/broadcasting/auth"
     set_env_value "$FRONTEND_DIR/.env" VITE_APP_URL "$frontend_url"
 
@@ -323,6 +369,14 @@ configure_production_env() {
     set_env_value "$ROOT_DIR/.env" DB_USERNAME "${DB_USERNAME:-$(env_value "$ROOT_DIR/.env" DB_USERNAME)}"
     set_env_value "$ROOT_DIR/.env" DB_PASSWORD "${DB_PASSWORD:-$(env_value "$ROOT_DIR/.env" DB_PASSWORD)}"
     set_env_value "$ROOT_DIR/.env" DB_ROOTPASSWORD "${DB_ROOTPASSWORD:-$(env_value "$ROOT_DIR/.env" DB_ROOTPASSWORD)}"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_APP_ID "$soketi_app_id"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_KEY "$soketi_key"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_SECRET "$soketi_secret"
+    set_env_value "$ROOT_DIR/.env" SOKETI_PORT "$soketi_port"
+    set_env_value "$ROOT_DIR/.env" SOKETI_METRICS_SERVER_PORT "${SOKETI_METRICS_SERVER_PORT:-9601}"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_CAPACITY "${SOKETI_DEFAULT_CAPACITY:-100}"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_ENABLE_CLIENT_MESSAGES "${SOKETI_DEFAULT_ENABLE_CLIENT_MESSAGES:-true}"
+    set_env_value "$ROOT_DIR/.env" SOKETI_DEFAULT_ENABLE_USER_AUTHENTICATION "${SOKETI_DEFAULT_ENABLE_USER_AUTHENTICATION:-true}"
 }
 
 ensure_app_key() {
@@ -338,7 +392,7 @@ main() {
     cd "$ROOT_DIR"
 
     step "Setting up Ticket System for production without Docker..."
-    warn "Set APP_URL, FRONTEND_URL, DB_DATABASE, DB_USERNAME, DB_PASSWORD, and DB_ROOTPASSWORD before running this on a real server."
+    warn "Using bundled default env values. Override APP_URL, FRONTEND_URL, DB_* and SOKETI_* variables for a real public server."
 
     package_install
 
@@ -380,6 +434,9 @@ main() {
 
     ensure_passport_keys
     ensure_passport_clients
+    install_soketi
+    write_soketi_launcher
+    prepare_run_scripts
 
     step "Caching Laravel production configuration..."
     (cd "$BACKEND_DIR" && php artisan optimize:clear)
@@ -394,6 +451,7 @@ main() {
     info "Production setup complete."
     printf '\nServe Laravel from: %s/public\n' "$BACKEND_DIR"
     printf 'Serve frontend static files from: %s/dist\n' "$FRONTEND_DIR"
+    printf 'Start realtime websocket server with: %s/start-soketi.sh\n' "$ROOT_DIR"
     printf 'Use a process manager or web server for PHP/Laravel in production; php artisan serve is not recommended for public production traffic.\n'
 }
 
