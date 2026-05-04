@@ -69,6 +69,24 @@ require_command() {
     fi
 }
 
+prompt_value() {
+    prompt=$1
+    default=$2
+
+    if [ "${NO_PROMPT:-0}" = "1" ] || [ ! -t 0 ]; then
+        printf '%s\n' "$default"
+        return 0
+    fi
+
+    printf '%s [%s]: ' "$prompt" "$default" >&2
+    read -r value
+    if [ -z "$value" ]; then
+        printf '%s\n' "$default"
+    else
+        printf '%s\n' "$value"
+    fi
+}
+
 composer_install_flags() {
     if php -r 'exit(PHP_VERSION_ID >= 80500 ? 0 : 1);' >/dev/null 2>&1; then
         printf '%s\n' "--ignore-platform-req=php"
@@ -345,12 +363,21 @@ configure_production_env() {
     pusher_host=${PUSHER_HOST:-$(env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST)}
     pusher_scheme=${PUSHER_SCHEME:-http}
     pusher_tls=${VITE_PUSHER_TLS:-false}
+    websocket_url=${VITE_WEBSOCKET_URL:-${WEBSOCKET_URL:-}}
 
     soketi_app_id=${soketi_app_id:-app-id}
     soketi_key=${soketi_key:-app-key}
     soketi_secret=${soketi_secret:-app-secret}
     soketi_port=${soketi_port:-6001}
     pusher_host=${pusher_host:-localhost}
+    if [ -z "$websocket_url" ]; then
+        if [ "$pusher_tls" = "true" ] || [ "$pusher_scheme" = "https" ]; then
+            websocket_url="wss://${pusher_host}:${soketi_port}"
+        else
+            websocket_url="ws://${pusher_host}:${soketi_port}"
+        fi
+    fi
+    websocket_url=$(prompt_value "Frontend websocket URL" "$websocket_url")
 
     set_env_value "$BACKEND_DIR/.env" APP_ENV production
     set_env_value "$BACKEND_DIR/.env" APP_DEBUG false
@@ -377,6 +404,7 @@ configure_production_env() {
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_HOST "$pusher_host"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_PORT "$soketi_port"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_TLS "$pusher_tls"
+    set_env_value "$FRONTEND_DIR/.env" VITE_WEBSOCKET_URL "$websocket_url"
     set_env_value "$FRONTEND_DIR/.env" VITE_PUSHER_AUTH_ENDPOINT "${api_url%/api}/broadcasting/auth"
     set_env_value "$FRONTEND_DIR/.env" VITE_APP_URL "$frontend_url"
 
